@@ -178,8 +178,149 @@ table.policies th, table.policies td {
 }
 table.policies th { background: var(--color-bg-alt); font-weight: 600; }
 
+/* ── Compliance badge strip ── */
+.compliance-strip { padding: 32px 0; border-bottom: 1px solid var(--color-border); }
+.compliance-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+.compliance-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  box-shadow: var(--shadow);
+  font-size: 14px;
+}
+.cb-icon { font-size: 18px; line-height: 1; }
+.cb-label { font-weight: 600; color: var(--color-text); white-space: nowrap; }
+
+.badge-implementing { background: #faf5ff; color: #6d28d9; }
+
+/* ── Framework detail cards ── */
+.section-lead {
+  color: var(--color-text-muted);
+  font-size: 16px;
+  max-width: 760px;
+  margin: 0 0 32px;
+}
+.framework-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+  gap: 20px;
+}
+.framework-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+.framework-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.framework-icon {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.framework-header h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+.framework-card > p {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+
+/* TSC criteria pills */
+.framework-criteria {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.criterion {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.criterion.active {
+  background: #ecfdf5;
+  color: var(--color-success);
+  border-color: #bbf7d0;
+}
+.criterion.muted {
+  background: var(--color-bg-alt);
+  color: var(--color-text-muted);
+  border-color: var(--color-border);
+}
+
+/* Progress bar */
+.framework-progress {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--color-text);
+}
+.progress-row.muted {
+  margin-top: 6px;
+  margin-bottom: 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+.progress-stat { font-weight: 700; color: var(--color-primary); }
+.progress-bar-wrap {
+  background: var(--color-border);
+  border-radius: 999px;
+  height: 6px;
+  overflow: hidden;
+}
+.progress-bar {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+/* Framework bullet list */
+.framework-details {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+}
+.framework-details li { margin-bottom: 4px; }
+
+@media (max-width: 960px) {
+  .framework-list { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 640px) {
   .hero h1 { font-size: 32px; }
   .site-header nav a { margin-left: 14px; font-size: 13px; }
   .header-inner { height: 56px; }
+  .compliance-badge { padding: 8px 12px; }
 }
