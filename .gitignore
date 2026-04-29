@@ -1,0 +1,45 @@
+# --- Sensitive evidence (NEVER commit) ---
+evidence/**/*.csv
+evidence/**/*_raw*
+evidence/**/*_export*
+evidence/**/*credentials*
+evidence/**/*secrets*
+evidence/**/*pii*
+evidence/**/customer-data*
+evidence/_collection_*/
+
+# --- Pen test reports (track via secure storage; commit only sanitized summaries) ---
+evidence/pen-tests/*.pdf
+!evidence/pen-tests/*-summary-redacted.pdf
+
+# --- Secrets / credentials (defense in depth — secrets should never be here) ---
+*.pem
+*.key
+*.p12
+*.pfx
+*.env
+.env.*
+!.env.example
+.envrc
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# --- Build / deps for any tooling we add later ---
+node_modules/
+dist/
+build/
+.cache/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# --- Working scratch ---
+scratch/
+tmp/

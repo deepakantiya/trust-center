@@ -1,0 +1,31 @@
+# GitHub CODEOWNERS — required reviewers per path
+# Replace handles with real GitHub usernames or teams once published.
+
+# Default
+*                                @org/grc-team
+
+# Policies — CISO must approve
+/policies/                       @org/ciso @org/grc-team
+
+# Controls and evidence
+/controls/                       @org/grc-team
+/evidence/                       @org/grc-team
+
+# SOC 2 mappings
+/soc2/                           @org/grc-team @org/ciso
+
+# Risk
+/risk-management/                @org/ciso @org/grc-team
+
+# Vendors
+/vendor-management/              @org/grc-team @org/legal
+
+# Incident response
+/incident-response/              @org/security @org/ciso
+
+# Website (public-facing)
+/website/                        @org/marketing @org/ciso
+
+# CI / scripts
+/.github/                        @org/security
+/scripts/                        @org/security

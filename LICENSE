@@ -1,0 +1,12 @@
+Copyright (c) [Year] [Company Name]
+
+All rights reserved. This repository contains proprietary and confidential
+information of [Company Name]. The contents of the `website/` directory
+are intended for public publication. The remainder of this repository
+(policies, controls, evidence, risk, vendor, and incident materials) is
+**not licensed for external distribution** and must not be shared, copied,
+or republished outside [Company Name] without prior written authorization
+from the Chief Information Security Officer.
+
+For permissioned access (e.g., auditors, regulators, prospects under NDA),
+contact: trust@example.com
