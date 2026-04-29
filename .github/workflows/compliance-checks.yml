@@ -1,0 +1,74 @@
+name: Compliance Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint Markdown
+        uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: |
+            **/*.md
+            !node_modules/**
+
+  link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check links in policies
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --exclude-mail --verbose './**/*.md'
+        continue-on-error: true
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  pii-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Block obvious PII patterns in evidence/
+        run: |
+          set -e
+          if find evidence -type f 2>/dev/null | xargs grep -nE \
+            '\b(\d{3}-\d{2}-\d{4})\b|\b(4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14})\b' 2>/dev/null; then
+            echo "::error::Possible SSN or credit card detected in evidence/. Remove before merging."
+            exit 1
+          fi
+          echo "No obvious PII patterns found."
+
+  policy-version-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ensure each policy has a Version and Revision History
+        run: |
+          set -e
+          fail=0
+          for f in policies/*.md; do
+            if ! grep -q "^| \*\*Version\*\*" "$f"; then
+              echo "::warning file=$f::Missing Version field"
+              fail=1
+            fi
+            if ! grep -q "Revision History" "$f"; then
+              echo "::warning file=$f::Missing Revision History"
+              fail=1
+            fi
+          done
+          # Warnings only — promote to fail when ready:
+          # exit $fail
