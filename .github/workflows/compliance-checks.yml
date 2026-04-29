@@ -42,33 +42,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Block obvious PII patterns in evidence/
-        run: |
-          set -e
-          if find evidence -type f 2>/dev/null | xargs grep -nE \
-            '\b(\d{3}-\d{2}-\d{4})\b|\b(4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14})\b' 2>/dev/null; then
-            echo "::error::Possible SSN or credit card detected in evidence/. Remove before merging."
-            exit 1
-          fi
-          echo "No obvious PII patterns found."
+        run: python scripts/pii_guard.py
 
   policy-version-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Ensure each policy has a Version and Revision History
-        run: |
-          set -e
-          fail=0
-          for f in policies/*.md; do
-            if ! grep -q "^| \*\*Version\*\*" "$f"; then
-              echo "::warning file=$f::Missing Version field"
-              fail=1
-            fi
-            if ! grep -q "Revision History" "$f"; then
-              echo "::warning file=$f::Missing Revision History"
-              fail=1
-            fi
-          done
-          # Warnings only — promote to fail when ready:
-          # exit $fail
+        run: python scripts/policy_version_check.py
