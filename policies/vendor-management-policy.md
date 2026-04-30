@@ -61,6 +61,17 @@ A current list of subprocessors handling customer data is published at [`/websit
 | Vendor monitoring | CC9.2 |
 | Vendor agreements | CC9.2 |
 
+## 5.1 NIST SP 800-53 Rev 5 Mapping
+
+| Requirement | NIST 800-53 |
+|---|---|
+| External system services | SA-9 |
+| Supply chain risk management plan | SR-2 |
+| Supply chain controls and processes | SR-3 |
+| Supplier assessments and reviews | SR-6 |
+| Notification agreements | SR-8 |
+| External personnel security | PS-7 |
+
 ## 6. Revision History
 | Version | Date | Changes |
 |---|---|---|

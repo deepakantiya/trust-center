@@ -73,6 +73,18 @@ Violations may result in disciplinary action up to and including termination, an
 | Policies reviewed and approved | CC5.3 |
 | Communication of policies | CC2.2, CC2.3 |
 
+## 4.1 NIST SP 800-53 Rev 5 Mapping
+
+| Control | NIST 800-53 |
+|---|---|
+| Information security program plan | PM-1 |
+| Security program leadership roles | PM-2 |
+| Policy and procedures | PL-1 |
+| System security and privacy plans | PL-2 |
+| Rules of behavior | PL-4 |
+| Risk management strategy | PM-9 |
+| Compliance monitoring | CA-2, CA-7 |
+
 ## 5. Related Policies
 
 - [Access Control Policy](./access-control-policy.md)

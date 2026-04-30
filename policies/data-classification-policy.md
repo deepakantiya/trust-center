@@ -48,6 +48,18 @@ See [Data Retention Schedule](./data-retention-schedule.md). Customer data is re
 | Confidentiality protection | C1.1, CC6.1 |
 | Disposal | C1.2, CC6.5 |
 
+## 7.1 NIST SP 800-53 Rev 5 Mapping
+
+| Requirement | NIST 800-53 |
+|---|---|
+| Security categorization | RA-2 |
+| Media access | MP-2 |
+| Media storage | MP-4 |
+| Media transport | MP-5 |
+| Media sanitization | MP-6 |
+| Information management and retention | SI-12 |
+| Protection of information at rest | SC-28 |
+
 ## 8. Revision History
 | Version | Date | Changes |
 |---|---|---|

@@ -47,6 +47,16 @@ Suspected violations: report to manager, HR, or `security@[company].com`. Anonym
 | Acceptable use communicated | CC2.2 |
 | Workforce conduct | CC1.4 |
 
+## 8.1 NIST SP 800-53 Rev 5 Mapping
+
+| Requirement | NIST 800-53 |
+|---|---|
+| Rules of behavior | PL-4 |
+| Awareness training | AT-2 |
+| System use notification | AC-8 |
+| Malicious code protection (endpoint) | SI-3 |
+| System monitoring | SI-4 |
+
 ## 9. Revision History
 | Version | Date | Changes |
 |---|---|---|

@@ -91,6 +91,22 @@ Findings from reviews must be remediated within 30 days; results recorded in [`e
 | Privileged access | CC6.1, CC6.3 |
 | Physical access | CC6.4, CC6.5 |
 
+## 5.1 NIST SP 800-53 Rev 5 Mapping
+
+| Requirement | NIST 800-53 |
+|---|---|
+| Access control policy and procedures | AC-1 |
+| Account management | AC-2 |
+| Access enforcement | AC-3 |
+| Separation of duties | AC-5 |
+| Least privilege | AC-6 |
+| Remote access | AC-17 |
+| Identification and authentication | IA-2 |
+| Identifier management | IA-4 |
+| Authenticator management (passwords/MFA) | IA-5 |
+| Physical access control | PE-2, PE-3 |
+| Monitoring physical access | PE-6 |
+
 ## 6. Enforcement
 
 Violations are reported to the CISO and may result in disciplinary action.
