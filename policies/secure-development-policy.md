@@ -65,6 +65,19 @@ Embed security throughout the software development lifecycle (SDLC).
 | Vulnerability management | CC7.1 |
 | Penetration testing | CC4.1 |
 
+## 4.1 NIST SP 800-53 Rev 5 Mapping
+
+| Requirement | NIST 800-53 |
+|---|---|
+| System development life cycle | SA-3 |
+| Security and privacy engineering principles | SA-8 |
+| Developer testing and evaluation | SA-11 |
+| Development process, standards, and tools | SA-15 |
+| Flaw remediation | SI-2 |
+| Vulnerability monitoring and scanning | RA-5 |
+| Penetration testing | CA-8 |
+| Configuration change control | CM-3 |
+
 ## 5. Revision History
 | Version | Date | Changes |
 |---|---|---|

@@ -73,6 +73,17 @@ Stored in [`evidence/change-management/`](../evidence/change-management/).
 | Testing prior to deployment | CC8.1 |
 | Documentation of changes | CC8.1 |
 
+## 6.1 NIST SP 800-53 Rev 5 Mapping
+
+| Requirement | NIST 800-53 |
+|---|---|
+| Configuration change control | CM-3 |
+| Baseline configuration | CM-2 |
+| Developer configuration management | SA-10 |
+| Separation of duties | AC-5 |
+| System development life cycle | SA-3 |
+| Developer testing and evaluation | SA-11 |
+
 ## 7. Revision History
 
 | Version | Date | Changes |
