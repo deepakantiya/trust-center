@@ -93,6 +93,18 @@ Remove threat: malware, unauthorized accounts, persistence mechanisms.
 | Communication of incidents | CC2.3, CC7.4 |
 | Recovery from incidents | A1.3, CC7.5 |
 
+## 8.1 NIST SP 800-53 Rev 5 Mapping
+
+| Requirement | NIST 800-53 |
+|---|---|
+| Incident response policy and procedures | IR-1 |
+| Incident response plan | IR-8 |
+| Incident handling | IR-4 |
+| Incident monitoring | IR-5 |
+| Incident reporting | IR-6 |
+| System monitoring | SI-4 |
+| System recovery and reconstitution | CP-10 |
+
 ## 9. Revision History
 
 | Version | Date | Changes |

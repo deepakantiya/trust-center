@@ -50,6 +50,17 @@ Results stored in [`evidence/bcdr/`](../evidence/bcdr/). Gaps tracked in risk re
 | BCDR plan | A1.3, CC7.5 |
 | Testing | A1.3 |
 
+## 6.1 NIST SP 800-53 Rev 5 Mapping
+
+| Requirement | NIST 800-53 |
+|---|---|
+| Contingency plan | CP-2 |
+| Contingency plan testing | CP-4 |
+| System backup | CP-9 |
+| Alternate processing site | CP-7 |
+| Telecommunications services | CP-8 |
+| System recovery and reconstitution | CP-10 |
+
 ## 7. Revision History
 | Version | Date | Changes |
 |---|---|---|

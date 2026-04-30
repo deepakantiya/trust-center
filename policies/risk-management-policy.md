@@ -59,6 +59,19 @@ Maintained in [`risk-management/risk-register.md`](../risk-management/risk-regis
 | Risk mitigation | CC3.4, CC9.1 |
 | Vendor risk | CC9.2 |
 
+## 4.1 NIST SP 800-53 Rev 5 Mapping
+
+| Requirement | NIST 800-53 |
+|---|---|
+| Risk assessment policy and procedures | RA-1 |
+| Security categorization | RA-2 |
+| Risk assessment | RA-3 |
+| Vulnerability monitoring and scanning | RA-5 |
+| Risk response | RA-7 |
+| Risk management strategy | PM-9 |
+| Control assessments | CA-2 |
+| Continuous monitoring | CA-7 |
+
 ## 5. Revision History
 | Version | Date | Changes |
 |---|---|---|

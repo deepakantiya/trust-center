@@ -50,6 +50,16 @@ Define cryptographic standards to protect Confidential and Restricted data at re
 | Encryption controls | CC6.1, CC6.7 |
 | Key management | CC6.1 |
 
+## 7.1 NIST SP 800-53 Rev 5 Mapping
+
+| Requirement | NIST 800-53 |
+|---|---|
+| Cryptographic protection | SC-13 |
+| Cryptographic key management | SC-12 |
+| Public key infrastructure certificates | SC-17 |
+| Protection of information at rest | SC-28 |
+| Transmission confidentiality and integrity | SC-8 |
+
 ## 8. Revision History
 | Version | Date | Changes |
 |---|---|---|
