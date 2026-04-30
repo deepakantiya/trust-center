@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GDPR Compliance | Trust Center</title>
+  <meta name="description" content="EU General Data Protection Regulation requirements mapped to operational controls and NIST SP 800-53 Rev 5.">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">[Company] · Trust Center</a>
+      <nav>
+        <a href="../index.html#frameworks">Frameworks</a>
+        <a href="../index.html#security">Controls</a>
+        <a href="../subprocessors.html">Subprocessors</a>
+        <a href="../security.html">Report Vulnerability</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="domain-hero">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="../index.html">Trust Center</a> &rsaquo;
+        <a href="../index.html#frameworks">Compliance Frameworks</a> &rsaquo;
+        <span>GDPR</span>
+      </nav>
+      <div class="domain-title">
+        <span class="domain-icon">🇪🇺</span>
+        <div>
+          <h1>GDPR — General Data Protection Regulation</h1>
+          <p class="lead">EU Regulation 2016/679 — key articles mapped to operational controls and NIST SP 800-53 Rev 5</p>
+        </div>
+      </div>
+      <div class="domain-meta">
+        <div class="domain-stat"><span class="stat-num">14</span><span class="stat-label">Articles</span></div>
+        <div class="domain-stat"><span class="stat-num">100%</span><span class="stat-label">Compliant</span></div>
+        <div class="framework-coverage">
+          <span class="fw-chip fw-iso">GDPR</span>
+          <span class="fw-chip fw-soc2">→ NIST 800-53</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <p class="controls-intro">
+        We act as a Data Processor for customer data and as a Data Controller for our own employee data. The table below maps the GDPR articles most relevant to our processing activities to operational controls and NIST SP 800-53 Rev 5 control families. See <a href="../privacy.html">Privacy Notice</a>, <a href="../dsr.html">Data Subject Request portal</a>, and <a href="../dpa.html">Data Processing Agreement</a>.
+      </p>
+
+      <div class="controls-table-wrap">
+        <table class="controls-table">
+          <thead><tr><th>Article</th><th class="td-name">Topic</th><th class="td-impl">Implementation</th><th>NIST 800-53</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><span class="ctrl-id">Art. 5</span></td><td class="td-name">Principles of Processing</td><td class="ctrl-impl">Lawfulness, fairness, transparency; purpose limitation; data minimization in design reviews; accuracy; storage limitation per retention schedule; integrity &amp; confidentiality controls.</td><td class="ctrl-map">PT-2, PT-3, RA-2, SI-12</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Art. 6</span></td><td class="td-name">Lawfulness of Processing</td><td class="ctrl-impl">Lawful basis recorded per processing activity in Records of Processing Activities (RoPA).</td><td class="ctrl-map">PT-2</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Art. 7</span></td><td class="td-name">Conditions for Consent</td><td class="ctrl-impl">Consent management platform records explicit, informed, withdrawable consent; cookie banner.</td><td class="ctrl-map">PT-4</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Arts. 12–14</span></td><td class="td-name">Transparency &amp; Information to Data Subjects</td><td class="ctrl-impl">Privacy Notice published, kept current, and surfaced at point of collection.</td><td class="ctrl-map">PT-5</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Arts. 15–22</span></td><td class="td-name">Data Subject Rights (Access, Rectification, Erasure, Portability, Objection)</td><td class="ctrl-impl">DSR portal with identity verification; ≤30 day response SLA; documented procedures for each right.</td><td class="ctrl-map">PT-2, PT-4, AC-2</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Art. 24</span></td><td class="td-name">Responsibility of the Controller</td><td class="ctrl-impl">DPO appointed; policies, training, and audits demonstrate compliance.</td><td class="ctrl-map">PM-1, PM-2, CA-2</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Art. 25</span></td><td class="td-name">Data Protection by Design &amp; by Default</td><td class="ctrl-impl">Privacy review for changes to personal-data handling; data minimization defaults in product features.</td><td class="ctrl-map">SA-8, PT-3</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Art. 28</span></td><td class="td-name">Processor Obligations</td><td class="ctrl-impl">DPA with all subprocessors; subprocessor list published with 30-day change notice.</td><td class="ctrl-map">SA-9, SR-3, SR-8</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Art. 30</span></td><td class="td-name">Records of Processing Activities (RoPA)</td><td class="ctrl-impl">RoPA maintained, reviewed semi-annually; data inventory mapping data → systems → classification.</td><td class="ctrl-map">CM-8, RA-2</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Art. 32</span></td><td class="td-name">Security of Processing</td><td class="ctrl-impl">Encryption in transit (TLS 1.3) and at rest (AES-256); access controls, MFA, logging, and tested resilience.</td><td class="ctrl-map">SC-8, SC-13, SC-28, AC-3, AU-2</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Arts. 33–34</span></td><td class="td-name">Personal Data Breach Notification</td><td class="ctrl-impl">72-hour regulator notification; affected data subject notice without undue delay; runbooks pre-staged.</td><td class="ctrl-map">IR-6, IR-8</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Art. 35</span></td><td class="td-name">Data Protection Impact Assessment (DPIA)</td><td class="ctrl-impl">DPIA template completed for high-risk processing; reviewed by DPO before go-live.</td><td class="ctrl-map">RA-3, PT-3</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Art. 37</span></td><td class="td-name">Data Protection Officer</td><td class="ctrl-impl">DPO appointed and resourced; published contact details; reports to executive leadership.</td><td class="ctrl-map">PM-2</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">Arts. 44–49</span></td><td class="td-name">International Data Transfers</td><td class="ctrl-impl">Standard Contractual Clauses (SCCs) in DPAs with non-EU/EEA processors; transfer impact assessments where required.</td><td class="ctrl-map">AC-20, SR-3</td><td><span class="status-impl">✅</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>© <span id="year"></span> [Company Name]. All rights reserved.</span>
+      <nav>
+        <a href="../index.html">Trust Center</a>
+        <a href="../index.html#frameworks">All Frameworks</a>
+        <a href="../security.html">Security</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="../js/site.js"></script>
+</body>
+</html>

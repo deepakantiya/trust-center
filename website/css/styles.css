@@ -518,3 +518,24 @@ table.policies th { background: var(--color-bg-alt); font-weight: 600; }
   .domain-icon { font-size: 30px; }
   .framework-coverage { margin-left: 0; }
 }
+
+/* ── Compliance badges as links ── */
+a.compliance-badge {
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .15s ease, transform .1s ease, box-shadow .15s ease;
+  cursor: pointer;
+}
+a.compliance-badge:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(15,23,42,.06), 0 12px 32px rgba(30,64,175,.12);
+}
+
+/* Framework cards as linked cards: ensure inner anchors stay above overlay */
+.framework-card.card-linked .card-link,
+.framework-card.card-linked > p a,
+.card.card-linked > ul a {
+  position: relative;
+  z-index: 1;
+}
