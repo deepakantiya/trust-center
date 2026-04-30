@@ -96,7 +96,7 @@ The ISMS covers the **design, development, operation, support, and security of t
 
 ## 6. Scope Boundaries Diagram
 
-```
+```text
 ┌───────────────────────────────────────────────────────┐
 │                  ISMS SCOPE BOUNDARY                  │
 │                                                       │

@@ -12,7 +12,7 @@ Some evidence contains personally identifiable information, security configurati
 
 ## Folder Layout
 
-```
+```text
 evidence/
 ├── access-reviews/          # Quarterly access review attestations
 ├── change-management/       # Sample PRs, CI runs, deploy logs (sampled)

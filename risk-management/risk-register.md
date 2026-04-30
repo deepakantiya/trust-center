@@ -19,7 +19,7 @@ This is the authoritative register of information security and privacy risks. Ea
 
 ## Heat Map (Inherent → Residual)
 
-```
+```text
 Impact
   5 │      R-008  R-001         R-004,007
   4 │ R-002       R-003,005,010

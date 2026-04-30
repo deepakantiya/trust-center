@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you've found a security issue in any of our products or this repository, please report it to **security@example.com**. For sensitive details, encrypt with our PGP key (see [website/security.html](./website/security.html)).
+If you've found a security issue in any of our products or this repository, please report it to **<security@example.com>**. For sensitive details, encrypt with our PGP key (see [website/security.html](./website/security.html)).
 
 We commit to:
 - **Acknowledge** within 2 business days

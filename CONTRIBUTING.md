@@ -30,7 +30,7 @@ See [`.gitignore`](./.gitignore). In particular:
 
 Use Conventional Commits where reasonable:
 
-```
+```text
 policy(access-control): tighten contractor access SLA to 24h
 docs(controls): map CC7.2 to new SIEM tooling
 chore(evidence): add Q1 access review attestations (sampled)
