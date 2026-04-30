@@ -40,4 +40,4 @@ Some artifacts live outside Git for sensitivity reasons; we'll provide them via 
 
 ## 5. Contact
 
-GRC Lead: grc@example.com · CISO: ciso@example.com
+GRC Lead: <grc@example.com> · CISO: <ciso@example.com>

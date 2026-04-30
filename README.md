@@ -18,7 +18,7 @@ A public-facing Trust Center and internal GRC (Governance, Risk, and Compliance)
 
 ## Repository Structure
 
-```
+```text
 trust-center/
 │
 ├── frameworks/                      # Per-framework onboarding and assessment workbooks
@@ -124,7 +124,7 @@ python3 scripts/framework_gap_check.py --all --format json > gap-report.json
 
 Sample output:
 
-```
+```text
   ✅  SOC 2 Type II         [████████████████████] 100.0%   46 implemented
   🟡  ISO 27001:2022         [██████████████████░░]  92.6%   87 ✅  7 🟡
   🟡  ISO/SAE 21434:2021    [█████████░░░░░░░░░░░]  48.0%   24 ✅  26 🟡

@@ -29,3 +29,202 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - say-hello
+version: 2.1
+
+# ─────────────────────────────────────────────
+# Orbs
+# ─────────────────────────────────────────────
+orbs:
+  python: circleci/python@2.1.1   # pip install + caching helpers
+
+# ─────────────────────────────────────────────
+# Pipeline parameters
+# Set these as Environment Variables in the
+# CircleCI project settings (Project → Settings
+# → Environment Variables) unless noted.
+# ─────────────────────────────────────────────
+# GITLEAKS_LICENSE       – required for Gitleaks commercial orb (free tier: leave unset,
+#                          use the OSS binary instead — see secret-scan job below)
+# SLACK_WEBHOOK          – optional: post job failure alerts to a Slack channel
+# EVIDENCE_DIR           – override default ./evidence output path (default: ./evidence)
+# CIRCLECI_TOKEN         – used by the CircleCI API trigger if you call pipelines manually
+
+# ─────────────────────────────────────────────
+# Reusable executors
+# ─────────────────────────────────────────────
+executors:
+  python-executor:
+    docker:
+      - image: cimg/python:3.12
+    resource_class: small
+
+  node-executor:
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+
+  base-executor:
+    docker:
+      - image: cimg/base:stable
+    resource_class: small
+
+# ─────────────────────────────────────────────
+# Reusable commands
+# ─────────────────────────────────────────────
+commands:
+  checkout-full:
+    description: Checkout with full history (needed for secret scanning)
+    steps:
+      - checkout
+      - run:
+          name: Fetch full git history
+          command: git fetch --unshallow || true
+
+# ─────────────────────────────────────────────
+# Jobs
+# ─────────────────────────────────────────────
+jobs:
+
+  # ── 1. Markdown lint ──────────────────────
+  lint-markdown:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Install markdownlint-cli2
+          command: sudo npm install -g markdownlint-cli2
+      - run:
+          name: Lint all Markdown files
+          command: |
+            markdownlint-cli2 "**/*.md" "!node_modules/**" "!.git/**"
+
+  # ── 2. Link check (warn-only) ─────────────
+  link-check:
+    executor: base-executor
+    steps:
+      - checkout
+      - run:
+          name: Install lychee
+          command: |
+            curl -sL https://github.com/lycheeverse/lychee/releases/latest/download/lychee-x86_64-unknown-linux-gnu.tar.gz \
+              -o /tmp/lychee.tar.gz
+            sudo tar -xz -C /usr/local/bin -f /tmp/lychee.tar.gz
+      - run:
+          name: Check links in Markdown files
+          # continue-on-error: link failures are advisory, not blocking
+          command: |
+            lychee --no-progress --exclude-mail --verbose './**/*.md' || true
+
+  # ── 3. Secret scan (Gitleaks) ─────────────
+  secret-scan:
+    executor: base-executor
+    steps:
+      - checkout-full
+      - run:
+          name: Install Gitleaks
+          command: |
+            GITLEAKS_VERSION=$(curl -s https://api.github.com/repos/gitleaks/gitleaks/releases/latest \
+              | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
+            curl -sL "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+              -o /tmp/gitleaks.tar.gz
+            sudo tar -xz -C /usr/local/bin -f /tmp/gitleaks.tar.gz gitleaks
+      - run:
+          name: Scan for secrets
+          # GITLEAKS_LICENSE env var required for paid features; OSS scan runs without it
+          command: gitleaks detect --source . --log-level warn
+
+  # ── 4. PII guard ──────────────────────────
+  pii-guard:
+    executor: python-executor
+    steps:
+      - checkout
+      - run:
+          name: Scan evidence/ for PII patterns (SSN, credit card)
+          command: python scripts/pii_guard.py
+
+  # ── 5. Policy version check ───────────────
+  policy-version-check:
+    executor: python-executor
+    steps:
+      - checkout
+      - run:
+          name: Verify all policies have Version and Revision History fields
+          command: python scripts/policy_version_check.py
+
+  # ── 6. Framework gap report ───────────────
+  # Runs on every push; stores gap report as a build artifact
+  framework-gap-report:
+    executor: python-executor
+    steps:
+      - checkout
+      - run:
+          name: Generate multi-framework gap report
+          command: |
+            python scripts/framework_gap_check.py --all --format json \
+              | tee gap-report.json
+            python scripts/framework_gap_check.py --all
+          # Exit 0 so gaps are reported but don't block the pipeline.
+          # Change to a plain `python scripts/framework_gap_check.py --all`
+          # (no `|| true`) to make gaps a hard failure.
+      - store_artifacts:
+          path: gap-report.json
+          destination: compliance/gap-report.json
+
+  # ── 7. Evidence collection (scheduled) ────
+  # Triggered by a scheduled pipeline (cron) — not on every commit.
+  collect-evidence:
+    executor: python-executor
+    environment:
+      EVIDENCE_DIR: ./evidence
+    steps:
+      - checkout
+      - run:
+          name: Collect compliance evidence
+          command: python scripts/collect_evidence.py
+      - store_artifacts:
+          path: ./evidence
+          destination: evidence
+
+# ─────────────────────────────────────────────
+# Workflows
+# ─────────────────────────────────────────────
+workflows:
+
+  # Runs on every push / PR
+  compliance-checks:
+    jobs:
+      - lint-markdown:
+          filters:
+            branches:
+              ignore: []   # run on all branches
+      - link-check:
+          filters:
+            branches:
+              ignore: []
+      - secret-scan:
+          filters:
+            branches:
+              ignore: []
+      - pii-guard:
+          filters:
+            branches:
+              ignore: []
+      - policy-version-check:
+          filters:
+            branches:
+              ignore: []
+      - framework-gap-report:
+          filters:
+            branches:
+              ignore: []
+
+  # Scheduled evidence collection — runs weekly (Monday 06:00 UTC)
+  # To enable: set up a Scheduled Pipeline in CircleCI UI:
+  #   Project → Triggers → Add Trigger → Scheduled → cron: 0 6 * * 1
+  #   Pipeline parameter: run_collect_evidence = true
+  scheduled-evidence:
+    when:
+      and:
+        - equal: [ scheduled_pipeline, << pipeline.trigger_source >> ]
+    jobs:
+      - collect-evidence

@@ -4,7 +4,7 @@ This repo is **already initialized as a Git repository** with an initial commit 
 
 ## Option A — GitHub via web + command line (fastest)
 
-1. Go to **https://github.com/new** and create a new repository:
+1. Go to **[github.com/new](https://github.com/new)** and create a new repository:
    - **Name:** `trust-center` (or whatever you prefer)
    - **Visibility:** **Private** is strongly recommended (this contains internal compliance materials)
    - **Do NOT** initialize with README, .gitignore, or license (we already have them)
