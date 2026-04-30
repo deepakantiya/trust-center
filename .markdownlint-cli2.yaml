@@ -1,12 +1,32 @@
 config:
-  # MD013 - Line length: compliance tables and control descriptions routinely exceed 80 chars
+  # ── Disabled: formatting-only rules not suitable for compliance documentation ──
+
+  # MD013 - Line length: control descriptions and tables routinely exceed 80 chars
   MD013: false
 
-  # MD060 - Table column style: pipe-table style varies across imported compliance templates
-  MD060: false
+  # MD022 - Blank lines around headings: policy docs use tight section layout
+  MD022: false
 
-  # MD033 - Inline HTML: Trust Center website files embed HTML snippets
+  # MD031 - Blank lines around fenced code: code blocks appear inline in control text
+  MD031: false
+
+  # MD032 - Blank lines around lists: compliance checklists use tight list layout
+  MD032: false
+
+  # MD033 - Inline HTML: Trust Center website files and tables embed HTML
   MD033: false
 
-  # MD041 - First heading: some policy files begin with a metadata/version block
+  # MD036 - Emphasis as heading: some templates use bold for sub-labels
+  MD036: false
+
+  # MD041 - First heading: policy files begin with a Version / metadata block
   MD041: false
+
+  # MD055 - Table pipe style: tables from different templates use varying styles
+  MD055: false
+
+  # MD058 - Blank lines around tables: compliance matrices are tightly packed
+  MD058: false
+
+  # MD060 - Table column style: varies across imported compliance templates
+  MD060: false
