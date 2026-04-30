@@ -43,3 +43,4 @@ venv/
 # --- Working scratch ---
 scratch/
 tmp/
+.gstack/
