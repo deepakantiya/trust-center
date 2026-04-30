@@ -61,7 +61,7 @@ jobs:
       - checkout
       - run:
           name: Install markdownlint-cli2
-          command: npm install -g markdownlint-cli2
+          command: sudo npm install -g markdownlint-cli2
       - run:
           name: Lint all Markdown files
           command: |
@@ -76,7 +76,8 @@ jobs:
           name: Install lychee
           command: |
             curl -sL https://github.com/lycheeverse/lychee/releases/latest/download/lychee-x86_64-unknown-linux-gnu.tar.gz \
-              | tar -xz -C /usr/local/bin lychee
+              -o /tmp/lychee.tar.gz
+            sudo tar -xz -C /usr/local/bin -f /tmp/lychee.tar.gz lychee
       - run:
           name: Check links in Markdown files
           # continue-on-error: link failures are advisory, not blocking
@@ -94,7 +95,8 @@ jobs:
             GITLEAKS_VERSION=$(curl -s https://api.github.com/repos/gitleaks/gitleaks/releases/latest \
               | grep '"tag_name"' | sed 's/.*"v\([^"]*\)".*/\1/')
             curl -sL "https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
-              | tar -xz -C /usr/local/bin gitleaks
+              -o /tmp/gitleaks.tar.gz
+            sudo tar -xz -C /usr/local/bin -f /tmp/gitleaks.tar.gz gitleaks
       - run:
           name: Scan for secrets
           # GITLEAKS_LICENSE env var required for paid features; OSS scan runs without it
