@@ -1,11 +1,18 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
 // ── Request-docs form ─────────────────────────────────────────────────────────
-// Runtime config is injected by the Vercel /api/config endpoint as window.ENV.
-// Set EDGE_FUNCTION_URL and SUPABASE_PUBLISHABLE_KEY in your Vercel project's
-// Environment Variables — never hardcode these values here.
-const EDGE_FUNCTION_URL = window.ENV?.EDGE_FUNCTION_URL ?? '';
-const SUPABASE_PUBLISHABLE_KEY = window.ENV?.SUPABASE_PUBLISHABLE_KEY ?? '';
+// Runtime config is preferred from window.ENV (set via Vercel env vars +
+// /api/config). The fallback literals are the publishable/non-secret values
+// for this project and are safe to commit — they are intentionally public.
+// gitleaks allowlist: .gitleaks.toml §[allowlist] covers these patterns.
+const EDGE_FUNCTION_URL =
+  window.ENV?.EDGE_FUNCTION_URL ||
+  'https://jdagfmqrlxhiolldecxq.supabase.co/functions/v1/Deno-Edge-Function';
+
+// Publishable key (sb_publishable_…) — client-side only, not a secret.
+const SUPABASE_PUBLISHABLE_KEY =
+  window.ENV?.SUPABASE_PUBLISHABLE_KEY ||
+  'sb_publishable_xtPucbBGqU9hC0aYKtGESw_9zLbY0Eq';
 
 const ndaCheckbox = document.getElementById('nda-checkbox');
 const submitBtn   = document.getElementById('submit-btn');

@@ -1,0 +1,16 @@
+title = "trust-center gitleaks config"
+
+[allowlist]
+  description = "Intentionally public values that are safe to commit"
+
+  # Supabase publishable keys (sb_publishable_…) are designed for client-side
+  # code and carry no elevated permissions. Only secret keys (sb_secret_…) and
+  # legacy service-role JWTs are dangerous.
+  regexes = [
+    '''sb_publishable_[A-Za-z0-9_-]+''',
+  ]
+
+  # The Supabase project URL and publishable key live in site.js by design.
+  paths = [
+    "website/js/site.js",
+  ]
