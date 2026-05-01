@@ -2,7 +2,11 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+// New: JWT Signing Keys (SUPABASE_SECRET_KEY). Falls back to the legacy
+// SUPABASE_SERVICE_ROLE_KEY if a project hasn't migrated yet.
+const SUPABASE_SECRET_KEY =
+  Deno.env.get("SUPABASE_SECRET_KEY") ??
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
 const FROM_EMAIL = Deno.env.get("FROM_EMAIL") ?? "trust@yourcompany.com";
 const COMPANY_NAME = Deno.env.get("COMPANY_NAME") ?? "[Company]";
@@ -72,7 +76,7 @@ serve(async (req) => {
     return json({ error: "No recognised document types selected" }, 400);
   }
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
 
   // Persist the request
   const { data: row, error: dbError } = await supabase
