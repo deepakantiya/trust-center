@@ -1,15 +1,9 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// ── Request-docs form ─────────────────────────────────────────────────────────
-// Runtime config is preferred from window.ENV (set via Vercel env vars +
-// /api/config). The fallback literals are the publishable/non-secret values
-// for this project and are safe to commit — they are intentionally public.
-// gitleaks allowlist: .gitleaks.toml §[allowlist] covers these patterns.
 const EDGE_FUNCTION_URL =
   window.ENV?.EDGE_FUNCTION_URL ||
   'https://jdagfmqrlxhiolldecxq.supabase.co/functions/v1/Deno-Edge-Function';
 
-// Publishable key (sb_publishable_…) — client-side only, not a secret.
 const SUPABASE_PUBLISHABLE_KEY =
   window.ENV?.SUPABASE_PUBLISHABLE_KEY ||
   'sb_publishable_xtPucbBGqU9hC0aYKtGESw_9zLbY0Eq';
@@ -84,18 +78,27 @@ async function submitRequest(e) {
   return false;
 }
 
+function safeUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' ? parsed.href : '';
+  } catch {
+    return '';
+  }
+}
+
 function showDocLinks(name, links) {
   if (!linksPanel || !requestForm) return;
 
-  // Build link cards
   const cards = links.map(l => {
-    if (!l.url) {
+    const href = safeUrl(l.url);
+    if (!href) {
       return `
         <div class="doc-link-card doc-link-unavailable">
           <div class="doc-link-info">
             <span class="doc-link-icon">📄</span>
             <div>
-              <strong>${l.label}</strong>
+              <strong>${escHtml(l.label)}</strong>
               <span class="doc-link-note">Temporarily unavailable — we'll follow up by email.</span>
             </div>
           </div>
@@ -106,11 +109,11 @@ function showDocLinks(name, links) {
         <div class="doc-link-info">
           <span class="doc-link-icon">📄</span>
           <div>
-            <strong>${l.label}</strong>
+            <strong>${escHtml(l.label)}</strong>
             <span class="doc-link-note">Link expires in 7 days</span>
           </div>
         </div>
-        <a class="btn btn-primary doc-link-btn" href="${l.url}" target="_blank" rel="noopener noreferrer">
+        <a class="btn btn-primary doc-link-btn" href="${href}" target="_blank" rel="noopener noreferrer">
           Download PDF
         </a>
       </div>`;
