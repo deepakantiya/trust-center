@@ -6,22 +6,19 @@ const EDGE_FUNCTION_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co/functions/v1
 
 // Publishable key — safe to expose in client JS (sb_publishable_...).
 // Issued via JWT Signing Keys: Supabase Dashboard → Settings → API Keys.
-// (Legacy anon keys still work but are deprecated.)
 const SUPABASE_PUBLISHABLE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
 
 const ndaCheckbox = document.getElementById('nda-checkbox');
 const submitBtn   = document.getElementById('submit-btn');
 const ndaBox      = document.getElementById('nda-box');
 const feedback    = document.getElementById('form-feedback');
+const requestForm = document.getElementById('request-form');
+const linksPanel  = document.getElementById('doc-links-panel');
 
 if (ndaCheckbox && submitBtn) {
   ndaCheckbox.addEventListener('change', () => {
     submitBtn.disabled = !ndaCheckbox.checked;
-    if (ndaCheckbox.checked) {
-      ndaBox.classList.add('nda-accepted');
-    } else {
-      ndaBox.classList.remove('nda-accepted');
-    }
+    ndaBox.classList.toggle('nda-accepted', ndaCheckbox.checked);
   });
 }
 
@@ -48,7 +45,7 @@ async function submitRequest(e) {
   }
 
   submitBtn.disabled = true;
-  submitBtn.textContent = 'Sending…';
+  submitBtn.textContent = 'Generating links…';
   hideFeedback();
 
   try {
@@ -63,13 +60,8 @@ async function submitRequest(e) {
 
     const payload = await res.json().catch(() => ({}));
 
-    if (res.ok && payload.success) {
-      showFeedback(
-        'success',
-        'Request received! Check your work email — your secure download links are on their way.'
-      );
-      form.reset();
-      ndaBox?.classList.remove('nda-accepted');
+    if (res.ok && payload.success && Array.isArray(payload.links)) {
+      showDocLinks(name, payload.links);
     } else {
       const msg = payload.error || 'Something went wrong. Please try again.';
       showFeedback('error', msg);
@@ -80,13 +72,76 @@ async function submitRequest(e) {
     submitBtn.disabled = false;
   } finally {
     submitBtn.textContent = 'Submit Request';
-    // Re-enable only if NDA is still checked (user may have unchecked on error)
-    if (ndaCheckbox && !ndaCheckbox.checked) {
-      submitBtn.disabled = true;
-    }
+    if (ndaCheckbox && !ndaCheckbox.checked) submitBtn.disabled = true;
   }
 
   return false;
+}
+
+function showDocLinks(name, links) {
+  if (!linksPanel || !requestForm) return;
+
+  // Build link cards
+  const cards = links.map(l => {
+    if (!l.url) {
+      return `
+        <div class="doc-link-card doc-link-unavailable">
+          <div class="doc-link-info">
+            <span class="doc-link-icon">📄</span>
+            <div>
+              <strong>${l.label}</strong>
+              <span class="doc-link-note">Temporarily unavailable — we'll follow up by email.</span>
+            </div>
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="doc-link-card">
+        <div class="doc-link-info">
+          <span class="doc-link-icon">📄</span>
+          <div>
+            <strong>${l.label}</strong>
+            <span class="doc-link-note">Link expires in 7 days</span>
+          </div>
+        </div>
+        <a class="btn btn-primary doc-link-btn" href="${l.url}" target="_blank" rel="noopener noreferrer">
+          Download PDF
+        </a>
+      </div>`;
+  }).join('');
+
+  linksPanel.innerHTML = `
+    <div class="doc-links-header">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <div>
+        <h3>Your documents are ready, ${escHtml(name)}</h3>
+        <p>These are unique, secure links governed by the NDA you accepted. Do not share them.</p>
+      </div>
+    </div>
+    <div class="doc-links-list">${cards}</div>
+    <div class="doc-links-footer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Links are unique to this session and expire automatically after 7 days.
+      <button class="doc-links-reset" onclick="resetForm()">Request different documents</button>
+    </div>`;
+
+  requestForm.hidden = true;
+  linksPanel.hidden = false;
+  linksPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function resetForm() {
+  if (!linksPanel || !requestForm) return;
+  linksPanel.hidden = true;
+  linksPanel.innerHTML = '';
+  requestForm.hidden = false;
+  requestForm.reset();
+  ndaBox?.classList.remove('nda-accepted');
+  if (submitBtn) submitBtn.disabled = true;
+}
+
+function escHtml(str) {
+  return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 function showFeedback(type, message) {

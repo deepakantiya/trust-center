@@ -204,6 +204,84 @@ body {
   cursor: pointer;
 }
 
+/* ── Document download links panel ── */
+.doc-links-panel {
+  background: #fff;
+  border: 1px solid #86efac;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.doc-links-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #f0fdf4;
+  border-bottom: 1px solid #bbf7d0;
+  padding: 20px 24px;
+  color: #15803d;
+}
+.doc-links-header svg { flex-shrink: 0; margin-top: 2px; }
+.doc-links-header h3 { margin: 0 0 4px; font-size: 16px; color: #14532d; }
+.doc-links-header p  { margin: 0; font-size: 13px; color: #166534; }
+.doc-links-list {
+  padding: 12px 16px;
+  display: grid;
+  gap: 10px;
+}
+.doc-link-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.doc-link-card.doc-link-unavailable {
+  opacity: .65;
+}
+.doc-link-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+.doc-link-icon { font-size: 20px; flex-shrink: 0; line-height: 1.2; }
+.doc-link-info strong { display: block; font-size: 13.5px; color: var(--color-text); }
+.doc-link-note  { display: block; font-size: 12px; color: var(--color-text-muted); margin-top: 2px; }
+.doc-link-btn {
+  flex-shrink: 0;
+  font-size: 13px;
+  padding: 8px 16px;
+  white-space: nowrap;
+}
+.doc-links-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-bg-alt);
+  border-top: 1px solid var(--color-border);
+  padding: 12px 20px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  flex-wrap: wrap;
+}
+.doc-links-footer svg { flex-shrink: 0; }
+.doc-links-reset {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+.doc-links-reset:hover { color: var(--color-primary-dark); }
+
 /* ── Form feedback (success / error) ── */
 .form-feedback {
   padding: 12px 16px;
