@@ -1,0 +1,81 @@
+name: DAST Security Scan
+
+on:
+  # Run after deployments (if you have a deploy workflow)
+  workflow_run:
+    workflows: ["Deploy to Production"]
+    types: [completed]
+  
+  # Or run weekly for periodic scanning
+  schedule:
+    - cron: '0 7 * * 1'  # Weekly Monday 7 AM UTC
+  
+  # Manual trigger with custom target URL
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Target URL to scan'
+        required: true
+        default: 'https://trust-center-pi.vercel.app/'
+
+permissions:
+  contents: read
+  security-events: write
+  issues: write
+
+jobs:
+  zap-scan:
+    name: OWASP ZAP Full Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Set target URL
+        id: set-url
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "target=${{ github.event.inputs.target_url }}" >> $GITHUB_OUTPUT
+          else
+            # Default URL - UPDATE THIS to your actual trust center URL
+            echo "target=https://your-trust-center-domain.com" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: OWASP ZAP Full Scan
+        uses: zaproxy/action-full-scan@v0.10.0
+        with:
+          target: ${{ steps.set-url.outputs.target }}
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j -l WARN'
+          allow_issue_writing: true
+          artifact_name: 'zap-scan-results'
+          
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-report
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+          retention-days: 30
+
+  # Baseline scan (faster, less intrusive - good for PRs)
+  zap-baseline:
+    name: OWASP ZAP Baseline Scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: ${{ github.event.inputs.target_url || 'https://trust-center-pi.vercel.app/' }}
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j'
+          allow_issue_writing: false
