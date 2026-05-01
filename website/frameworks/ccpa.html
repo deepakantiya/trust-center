@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CCPA / CPRA Compliance | Trust Center</title>
+  <meta name="description" content="California Consumer Privacy Act (as amended by CPRA) requirements mapped to operational controls and NIST SP 800-53 Rev 5.">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">[Company] · Trust Center</a>
+      <nav>
+        <a href="../index.html#frameworks">Frameworks</a>
+        <a href="../index.html#security">Controls</a>
+        <a href="../subprocessors.html">Subprocessors</a>
+        <a href="../security.html">Report Vulnerability</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="domain-hero">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="../index.html">Trust Center</a> &rsaquo;
+        <a href="../index.html#frameworks">Compliance Frameworks</a> &rsaquo;
+        <span>CCPA / CPRA</span>
+      </nav>
+      <div class="domain-title">
+        <span class="domain-icon">🇺🇸</span>
+        <div>
+          <h1>CCPA &amp; CPRA</h1>
+          <p class="lead">California Consumer Privacy Act (as amended by CPRA) — consumer rights and obligations mapped to NIST SP 800-53 Rev 5</p>
+        </div>
+      </div>
+      <div class="domain-meta">
+        <div class="domain-stat"><span class="stat-num">10</span><span class="stat-label">Requirements</span></div>
+        <div class="domain-stat"><span class="stat-num">100%</span><span class="stat-label">Compliant</span></div>
+        <div class="framework-coverage">
+          <span class="fw-chip fw-iso">CCPA / CPRA</span>
+          <span class="fw-chip fw-soc2">→ NIST 800-53</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <p class="controls-intro">
+        We support all consumer rights granted by the California Consumer Privacy Act of 2018 (Cal. Civ. Code § 1798.100 et seq.) as amended by the California Privacy Rights Act of 2020. The table below maps each statutory requirement to operational controls and NIST SP 800-53 Rev 5 control families.
+      </p>
+
+      <div class="controls-table-wrap">
+        <table class="controls-table">
+          <thead><tr><th>Section</th><th class="td-name">Requirement</th><th class="td-impl">Implementation</th><th>NIST 800-53</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><span class="ctrl-id">§ 1798.100</span></td><td class="td-name">Right to Know — General</td><td class="ctrl-impl">Privacy Notice discloses categories of personal information collected, purposes, and sources at or before collection.</td><td class="ctrl-map">PT-5</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">§ 1798.105</span></td><td class="td-name">Right to Delete</td><td class="ctrl-impl">DSR portal with identity verification; 45-day response SLA; cryptographic erasure for stored data; deletion propagated to subprocessors.</td><td class="ctrl-map">SI-12, MP-6</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">§ 1798.106</span></td><td class="td-name">Right to Correct</td><td class="ctrl-impl">Self-service correction in account settings; DSR portal for corrections requiring verification.</td><td class="ctrl-map">PT-2, PT-4</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">§ 1798.110</span></td><td class="td-name">Right to Know — Specific Pieces</td><td class="ctrl-impl">DSR portal returns categories and specific pieces of personal information collected in the past 12 months.</td><td class="ctrl-map">PT-5, AC-2</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">§ 1798.115</span></td><td class="td-name">Right to Know — Sale / Sharing</td><td class="ctrl-impl">We do not sell personal information. Categories of personal information shared for cross-context advertising disclosed.</td><td class="ctrl-map">PT-2, PT-3</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">§ 1798.120</span></td><td class="td-name">Right to Opt-Out of Sale / Sharing</td><td class="ctrl-impl">"Do Not Sell or Share My Personal Information" link on website; Global Privacy Control (GPC) signal honored.</td><td class="ctrl-map">PT-4</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">§ 1798.121</span></td><td class="td-name">Right to Limit Use of Sensitive PI</td><td class="ctrl-impl">Sensitive personal information used only for permitted purposes; "Limit the Use" link surfaced where applicable.</td><td class="ctrl-map">PT-3, RA-2</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">§ 1798.125</span></td><td class="td-name">Non-Discrimination</td><td class="ctrl-impl">No degraded service or pricing for consumers exercising privacy rights; financial incentives (where offered) clearly disclosed.</td><td class="ctrl-map">PT-2</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">§ 1798.130</span></td><td class="td-name">Notice &amp; Disclosure Mechanisms</td><td class="ctrl-impl">Two or more methods to submit DSRs (web form, email); employee training on consumer-facing privacy obligations.</td><td class="ctrl-map">PT-5, AT-2</td><td><span class="status-impl">✅</span></td></tr>
+            <tr><td><span class="ctrl-id">§ 1798.150</span></td><td class="td-name">Security &amp; Breach Liability</td><td class="ctrl-impl">Reasonable security measures: encryption at rest and in transit, MFA, RBAC, logging, monitoring, vulnerability management, annual pen test.</td><td class="ctrl-map">SC-8, SC-28, AC-3, IA-2, RA-5, IR-4</td><td><span class="status-impl">✅</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>© <span id="year"></span> [Company Name]. All rights reserved.</span>
+      <nav>
+        <a href="../index.html">Trust Center</a>
+        <a href="../index.html#frameworks">All Frameworks</a>
+        <a href="../security.html">Security</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="../js/site.js"></script>
+</body>
+</html>
