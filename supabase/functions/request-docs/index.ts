@@ -2,15 +2,13 @@ import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-// New: JWT Signing Keys (SUPABASE_SECRET_KEY). Falls back to the legacy
-// SUPABASE_SERVICE_ROLE_KEY if a project hasn't migrated yet.
+// Supports both new JWT Signing Key (SUPABASE_SECRET_KEY) and legacy service role key.
 const SUPABASE_SECRET_KEY =
   Deno.env.get("SUPABASE_SECRET_KEY") ??
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY")!;
-const FROM_EMAIL = Deno.env.get("FROM_EMAIL") ?? "trust@yourcompany.com";
-const COMPANY_NAME = Deno.env.get("COMPANY_NAME") ?? "[Company]";
+
 const STORAGE_BUCKET = "audit-docs";
+const LINK_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
 const DOC_LABELS: Record<string, string> = {
   soc2: "SOC 2 Type II Report",
@@ -41,7 +39,6 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: CORS_HEADERS });
   }
-
   if (req.method !== "POST") {
     return json({ error: "Method not allowed" }, 405);
   }
@@ -78,7 +75,7 @@ serve(async (req) => {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY);
 
-  // Persist the request
+  // ── Insert request row ────────────────────────────────────────────────────
   const { data: row, error: dbError } = await supabase
     .from("document_requests")
     .insert({
@@ -97,111 +94,43 @@ serve(async (req) => {
     return json({ error: "Failed to record request" }, 500);
   }
 
-  // Build signed download links (7-day expiry) for each requested PDF
-  const docLinks: { label: string; url: string }[] = [];
-  for (const docKey of validDocs) {
+  // ── Generate unique signed URLs (7-day expiry) per requested PDF ──────────
+  const expiresAt = new Date(Date.now() + LINK_TTL_SECONDS * 1000).toISOString();
+  const links: { key: string; label: string; url: string; expires_at: string }[] = [];
+
+  for (const key of validDocs) {
     const { data: signed, error: storageErr } = await supabase.storage
       .from(STORAGE_BUCKET)
-      .createSignedUrl(DOC_PATHS[docKey], 7 * 24 * 60 * 60);
-    if (!storageErr && signed?.signedUrl) {
-      docLinks.push({ label: DOC_LABELS[docKey], url: signed.signedUrl });
+      .createSignedUrl(DOC_PATHS[key], LINK_TTL_SECONDS);
+
+    if (storageErr || !signed?.signedUrl) {
+      console.error(`Signed URL error for ${key}:`, storageErr);
+      links.push({ key, label: DOC_LABELS[key], url: "", expires_at: expiresAt });
     } else {
-      // Still list the document even if we couldn't generate a link
-      docLinks.push({ label: DOC_LABELS[docKey], url: "" });
+      links.push({ key, label: DOC_LABELS[key], url: signed.signedUrl, expires_at: expiresAt });
     }
   }
 
-  const emailSent = await sendEmail(name.trim(), email.trim(), docLinks);
-  const status = emailSent ? "sent" : "failed";
-
+  // ── Persist links and mark completed ─────────────────────────────────────
+  const allGenerated = links.every((l) => l.url !== "");
   await supabase
     .from("document_requests")
-    .update({ status })
+    .update({ links, status: allGenerated ? "completed" : "failed" })
     .eq("id", row.id);
 
-  if (!emailSent) {
-    // Request is logged; email failed — return success to client anyway so the
-    // request isn't lost. Internal ops can re-send from the DB.
-    console.error("Email send failed for request", row.id);
+  if (!allGenerated) {
+    console.error("One or more signed URLs could not be generated for request", row.id);
   }
 
-  return json({ success: true });
+  // Return the links directly to the browser — no email needed.
+  return json({ success: true, links });
 });
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// ── helper ───────────────────────────────────────────────────────────────────
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
   });
-}
-
-async function sendEmail(
-  name: string,
-  to: string,
-  docLinks: { label: string; url: string }[],
-): Promise<boolean> {
-  const linksHtml = docLinks
-    .map((l) =>
-      l.url
-        ? `<li style="margin-bottom:8px;"><a href="${l.url}" style="color:#1e40af;font-weight:600;">${l.label}</a> <span style="color:#94a3b8;font-size:12px;">(expires in 7 days)</span></li>`
-        : `<li style="margin-bottom:8px;color:#475569;">${l.label} — link will follow within 2 business days</li>`
-    )
-    .join("\n");
-
-  const html = `
-<!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"></head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#f7f9fb;margin:0;padding:32px 16px;">
-  <div style="max-width:580px;margin:0 auto;background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;">
-    <div style="background:#1e40af;padding:28px 32px;">
-      <h1 style="margin:0;color:#fff;font-size:20px;font-weight:700;">${COMPANY_NAME} · Trust Center</h1>
-    </div>
-    <div style="padding:32px;">
-      <h2 style="margin:0 0 16px;font-size:18px;color:#0f172a;">Your document request is confirmed</h2>
-      <p style="color:#475569;margin:0 0 8px;">Hi ${name},</p>
-      <p style="color:#475569;margin:0 0 20px;">
-        Thank you for accepting our Non-Disclosure Agreement. Your secure download links are ready:
-      </p>
-      <ul style="padding-left:20px;margin:0 0 24px;color:#0f172a;line-height:1.8;">
-        ${linksHtml}
-      </ul>
-      <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:14px 18px;margin-bottom:24px;">
-        <p style="margin:0;font-size:13px;color:#92400e;">
-          <strong>Confidentiality reminder:</strong> These documents are protected by the NDA you accepted.
-          Please do not forward or share them with third parties.
-        </p>
-      </div>
-      <p style="color:#94a3b8;font-size:12px;margin:0;">
-        If you have questions, reply to this email or contact
-        <a href="mailto:${FROM_EMAIL}" style="color:#1e40af;">${FROM_EMAIL}</a>.
-      </p>
-    </div>
-    <div style="background:#f7f9fb;border-top:1px solid #e2e8f0;padding:16px 32px;text-align:center;">
-      <p style="margin:0;font-size:12px;color:#94a3b8;">© ${new Date().getFullYear()} ${COMPANY_NAME}. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>`;
-
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: FROM_EMAIL,
-      to: [to],
-      subject: `Your ${COMPANY_NAME} Trust Center documents`,
-      html,
-    }),
-  });
-
-  if (!res.ok) {
-    console.error("Resend error", res.status, await res.text());
-  }
-  return res.ok;
 }
