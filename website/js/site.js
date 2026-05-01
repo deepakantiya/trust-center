@@ -1,9 +1,8 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
 // ── Request-docs form ─────────────────────────────────────────────────────────
-// Replace this URL with your Supabase project's Edge Function endpoint.
-// Format: https://<project-ref>.supabase.co/functions/v1/request-docs
-const EDGE_FUNCTION_URL = 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/request-docs';
+// Edge Function endpoint — update if you rename the function in the Supabase console.
+const EDGE_FUNCTION_URL = 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/Deno-Edge-Function';
 
 // Publishable key — safe to expose in client JS (sb_publishable_...).
 // Issued via JWT Signing Keys: Supabase Dashboard → Settings → API Keys.
@@ -57,7 +56,6 @@ async function submitRequest(e) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'apikey': SUPABASE_PUBLISHABLE_KEY,
         'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
       },
       body: JSON.stringify({ name, email, company, docs, nda_accepted: true }),
