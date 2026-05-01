@@ -1,14 +1,11 @@
 document.getElementById('year').textContent = new Date().getFullYear();
 
 // ── Request-docs form ─────────────────────────────────────────────────────────
-// Replace this URL with your Supabase project's Edge Function endpoint.
-// Format: https://<project-ref>.supabase.co/functions/v1/request-docs
-const EDGE_FUNCTION_URL = 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/Deno-Edge-Function';
-
-// Publishable key — safe to expose in client JS (sb_publishable_...).
-// Issued via JWT Signing Keys: Supabase Dashboard → Settings → API Keys.
-// (Legacy anon keys still work but are deprecated.)
-const SUPABASE_PUBLISHABLE_KEY = 'REDACTED_PUBLISHABLE_KEY';
+// Values are injected at runtime by the Vercel /api/config serverless function,
+// which reads them from Vercel Environment Variables. Nothing sensitive is
+// stored in this file or in git.
+const EDGE_FUNCTION_URL      = window.ENV?.EDGE_FUNCTION_URL      ?? '';
+const SUPABASE_PUBLISHABLE_KEY = window.ENV?.SUPABASE_PUBLISHABLE_KEY ?? '';
 
 const ndaCheckbox = document.getElementById('nda-checkbox');
 const submitBtn   = document.getElementById('submit-btn');
