@@ -79,12 +79,15 @@ trust-center/
 │   ├── processing-integrity/
 │   └── privacy/
 │
+├── api/
+│   └── config.js                    # Vercel serverless function — serves runtime config as window.ENV
+│
 ├── website/                         # Public Trust Center static site
 │   ├── index.html                   # Main page (SOC 2, ISO 27001, CMMC, privacy)
 │   ├── security.html                # Vulnerability disclosure policy
 │   ├── subprocessors.html           # Subprocessor list
 │   ├── css/styles.css
-│   ├── js/site.js
+│   ├── js/site.js                   # Reads config from window.ENV (injected by /api/config)
 │   └── .well-known/security.txt
 │
 ├── scripts/                         # Python automation scripts
@@ -140,6 +143,15 @@ cd website && python3 -m http.server 8080
 ```
 
 The site shows framework status badges, per-framework progress bars, and a document request form for SOC 2 reports, ISO 27001 SoA, and CMMC assessment workbooks.
+
+> **Note:** The document request form requires two environment variables set in your Vercel project
+> (Project → Settings → Environment Variables). These are served at runtime by `api/config.js` as
+> `window.ENV` — **never hardcode them in source files**.
+>
+> | Variable | Description |
+> |---|---|
+> | `EDGE_FUNCTION_URL` | Supabase Edge Function endpoint (`https://<ref>.supabase.co/functions/v1/<name>`) |
+> | `SUPABASE_PUBLISHABLE_KEY` | Publishable key from Supabase Dashboard → Settings → API Keys |
 
 ---
 
