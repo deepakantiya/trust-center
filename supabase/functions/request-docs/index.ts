@@ -20,7 +20,7 @@ const DOC_LABELS: Record<string, string> = {
 };
 
 const DOC_PATHS: Record<string, string> = {
-  soc2: "soc2.pdf",
+  soc2: "https://YOUR_PROJECT_REF.supabase.co/storage/v1/object/sign/audit-docs/soc2.pdf?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV82NGJkMjEyMy02NmIwLTRkNjctOTVhZi02YmE5Zjg1Mjc4NDkiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJhdWRpdC1kb2NzL3NvYzIucGRmIiwiaWF0IjoxNzc3NjIyMzQyLCJleHAiOjE3ODAyMTQzNDJ9.XEAHH7q8Nc5Zil1uF6Xd-DQ6s2OOLADUqEku3x-TRuk",
   iso27001: "iso27001.pdf",
   cmmc: "cmmc.pdf",
   pentest: "pentest.pdf",
