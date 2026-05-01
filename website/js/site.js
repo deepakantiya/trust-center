@@ -5,9 +5,10 @@ document.getElementById('year').textContent = new Date().getFullYear();
 // Format: https://<project-ref>.supabase.co/functions/v1/request-docs
 const EDGE_FUNCTION_URL = 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/request-docs';
 
-// Public anon key — safe to expose in client JS.
-// Set this to your project's anon key from the Supabase dashboard (Settings → API).
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+// Publishable key — safe to expose in client JS (sb_publishable_...).
+// Issued via JWT Signing Keys: Supabase Dashboard → Settings → API Keys.
+// (Legacy anon keys still work but are deprecated.)
+const SUPABASE_PUBLISHABLE_KEY = 'YOUR_SUPABASE_PUBLISHABLE_KEY';
 
 const ndaCheckbox = document.getElementById('nda-checkbox');
 const submitBtn   = document.getElementById('submit-btn');
@@ -56,7 +57,8 @@ async function submitRequest(e) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'apikey': SUPABASE_PUBLISHABLE_KEY,
+        'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
       },
       body: JSON.stringify({ name, email, company, docs, nda_accepted: true }),
     });
