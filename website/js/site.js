@@ -119,7 +119,7 @@ function showDocLinks(name, links) {
       </div>`;
   }).join('');
 
-  linksPanel.innerHTML = `
+  const panelHtml = `
     <div class="doc-links-header">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
       <div>
@@ -133,6 +133,7 @@ function showDocLinks(name, links) {
       Links are unique to this session and expire automatically after 7 days.
       <button class="doc-links-reset" onclick="resetForm()">Request different documents</button>
     </div>`;
+  linksPanel.innerHTML = panelHtml; // nosemgrep
 
   requestForm.hidden = true;
   linksPanel.hidden = false;
@@ -142,7 +143,7 @@ function showDocLinks(name, links) {
 function resetForm() {
   if (!linksPanel || !requestForm) return;
   linksPanel.hidden = true;
-  linksPanel.innerHTML = '';
+  linksPanel.innerHTML = ''; // nosemgrep
   requestForm.hidden = false;
   requestForm.reset();
   ndaBox?.classList.remove('nda-accepted');

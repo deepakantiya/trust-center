@@ -4,6 +4,7 @@ Initialize this directory as a Git repo and push it to your hosting provider.
 Run from the repository root after editing the variables below.
 """
 
+import shlex
 import subprocess
 from pathlib import Path
 
@@ -23,11 +24,11 @@ REMOTE_URLS = {
 
 
 def run(cmd: str, check: bool = True) -> None:
-    subprocess.run(cmd, shell=True, check=check)
+    subprocess.run(shlex.split(cmd), check=check)
 
 
 def run_output(cmd: str) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    return subprocess.run(shlex.split(cmd), capture_output=True, text=True)
 
 
 if not Path(".git").is_dir():
