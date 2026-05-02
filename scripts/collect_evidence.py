@@ -3,6 +3,7 @@
 
 import hashlib
 import os
+import shlex
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,7 +23,7 @@ def log(msg: str) -> None:
 
 
 def run(cmd: str, output_file: str | None = None, allow_fail: bool = False) -> subprocess.CompletedProcess:
-    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)  # nosec B603,B607 nosemgrep
+    result = subprocess.run(shlex.split(cmd), capture_output=True, text=True)
     if result.returncode != 0 and not allow_fail:
         raise subprocess.CalledProcessError(result.returncode, cmd, result.stdout, result.stderr)
     if output_file:
