@@ -4,17 +4,18 @@ import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
 
-// Only redirect to Supabase Storage signed URLs — prevents open redirect abuse
-// if the short_urls table were ever written to by an untrusted path.
+// Only redirect to Supabase Storage signed URLs — prevents open redirect abuse.
+// Checks HTTPS + *.supabase.co hostname + signed-URL path prefix, falling back
+// to an exact hostname match when SUPABASE_URL is configured.
 function isTrustedUrl(url) {
   try {
     const parsed = new URL(url);
-    const supabaseHost = new URL(SUPABASE_URL).hostname;
-    return (
-      parsed.protocol === "https:" &&
-      parsed.hostname === supabaseHost &&
-      parsed.pathname.startsWith("/storage/v1/object/sign/")
-    );
+    if (parsed.protocol !== "https:") return false;
+    if (!parsed.pathname.startsWith("/storage/v1/object/sign/")) return false;
+    if (SUPABASE_URL) {
+      return parsed.hostname === new URL(SUPABASE_URL).hostname;
+    }
+    return parsed.hostname.endsWith(".supabase.co");
   } catch {
     return false;
   }
