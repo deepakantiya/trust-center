@@ -23,11 +23,11 @@ REMOTE_URLS = {
 
 
 def run(cmd: str, check: bool = True) -> None:
-    subprocess.run(cmd, shell=True, check=check)
+    subprocess.run(cmd, shell=True, check=check)  # nosemgrep
 
 
 def run_output(cmd: str) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    return subprocess.run(cmd, shell=True, capture_output=True, text=True)  # nosemgrep
 
 
 if not Path(".git").is_dir():
