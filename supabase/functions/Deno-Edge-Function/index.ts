@@ -7,6 +7,10 @@ const SUPABASE_SECRET_KEY =
   Deno.env.get("SUPABASE_SECRET_KEY") ??
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
+// Public base URL of the Vercel frontend (e.g. https://trust-center.example.com).
+// Falls back to the Supabase URL origin so local dev still works.
+const SITE_BASE_URL = (Deno.env.get("SITE_BASE_URL") ?? "").replace(/\/$/, "");
+
 const STORAGE_BUCKET = "audit-docs";
 const LINK_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 
@@ -34,6 +38,13 @@ const CORS_HEADERS = {
     "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+
+// Generates a cryptographically random 8-character alphanumeric code.
+function shortCode(): string {
+  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  return Array.from(bytes, (b) => chars[b % chars.length]).join("");
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -94,9 +105,10 @@ serve(async (req) => {
     return json({ error: "Failed to record request" }, 500);
   }
 
-  // ── Generate unique signed URLs (7-day expiry) per requested PDF ──────────
+  // ── Generate signed URLs and short codes ──────────────────────────────────
   const expiresAt = new Date(Date.now() + LINK_TTL_SECONDS * 1000).toISOString();
   const links: { key: string; label: string; url: string; expires_at: string }[] = [];
+  const shortRows: { code: string; request_id: string; doc_key: string; full_url: string; expires_at: string }[] = [];
 
   for (const key of validDocs) {
     const { data: signed, error: storageErr } = await supabase.storage
@@ -107,7 +119,26 @@ serve(async (req) => {
       console.error(`Signed URL error for ${key}:`, storageErr);
       links.push({ key, label: DOC_LABELS[key], url: "", expires_at: expiresAt });
     } else {
-      links.push({ key, label: DOC_LABELS[key], url: signed.signedUrl, expires_at: expiresAt });
+      const code = shortCode();
+      shortRows.push({
+        code,
+        request_id: row.id,
+        doc_key: key,
+        full_url: signed.signedUrl,
+        expires_at: expiresAt,
+      });
+      const shortUrl = SITE_BASE_URL
+        ? `${SITE_BASE_URL}/r/${code}`
+        : signed.signedUrl;
+      links.push({ key, label: DOC_LABELS[key], url: shortUrl, expires_at: expiresAt });
+    }
+  }
+
+  // ── Persist short URL mappings ────────────────────────────────────────────
+  if (shortRows.length > 0) {
+    const { error: shortErr } = await supabase.from("short_urls").insert(shortRows);
+    if (shortErr) {
+      console.error("short_urls insert error:", shortErr);
     }
   }
 
