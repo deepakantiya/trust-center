@@ -1,10 +1,12 @@
 {
   "outputDirectory": "website",
   "functions": {
-    "api/config.js": { "runtime": "nodejs20.x" }
+    "api/config.js": { "runtime": "nodejs20.x" },
+    "api/r.js": { "runtime": "nodejs20.x" }
   },
   "rewrites": [
-    { "source": "/api/config", "destination": "/api/config.js" }
+    { "source": "/api/config", "destination": "/api/config.js" },
+    { "source": "/r/:code", "destination": "/api/r.js?code=:code" }
   ],
   "headers": [
     {
