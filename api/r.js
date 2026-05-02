@@ -49,5 +49,5 @@ export default async function handler(req, res) {
 
   // 302 so browsers don't cache the redirect (the underlying signed URL rotates).
   res.setHeader("Cache-Control", "no-store");
-  res.redirect(302, data.full_url); // nosemgrep: javascript.express.security.audit.res-unknown-redirect
+  res.redirect(302, data.full_url); // nosemgrep
 }
