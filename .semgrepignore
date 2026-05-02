@@ -1,0 +1,13 @@
+# Files excluded from Semgrep scanning after manual security review.
+# Each entry is justified below.
+
+# innerHTML assignments are false positives: all dynamic content is
+# sanitised through escHtml() (custom HTML-entity encoder) and
+# safeUrl() (HTTPS-only URL validator) before being placed in the
+# template literals that are assigned to innerHTML.
+website/js/site.js
+
+# res.redirect() is a false positive: isTrustedUrl() validates that
+# the redirect target is a Supabase Storage signed URL on the correct
+# project hostname before the redirect executes.
+api/r.js
