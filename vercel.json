@@ -6,7 +6,7 @@
   },
   "rewrites": [
     { "source": "/api/config", "destination": "/api/config.js" },
-    { "source": "/r/:code", "destination": "/api/r.js?code=:code" }
+    { "source": "/r/:code", "destination": "/api/r?code=:code" }
   ],
   "headers": [
     {
