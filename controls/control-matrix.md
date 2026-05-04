@@ -1,140 +1,140 @@
 # SOC 2 Control Matrix
 
-This matrix maps each AICPA Trust Services Criterion to the implemented control(s), the policy/process owner, the system(s) where it operates, and the evidence collected.
+This matrix maps each control domain to the implemented control(s), the policy/process owner, and the evidence collected.
 
 **Legend**
-- **TSC** = Trust Services Criterion reference
 - **Status:** ✅ Operating · 🟡 Partial · 🔴 Gap · ⚪ Not in scope
 - **Frequency:** how often the control runs
 - **Test type:** Inquiry (I), Observation (O), Inspection (Insp), Re-performance (R)
 
 ---
 
-## Common Criteria — Security (CC)
+## Change Management
 
-### CC1 — Control Environment
-
-| ID | Criterion | Control Description | Owner | Status | Evidence |
+| ID | Control | Description | Owner | Status | Evidence |
 |---|---|---|---|---|---|
-| CC1.1 | Demonstrates commitment to integrity and ethical values | Code of Conduct signed at hire and annually; whistleblower channel; disciplinary process | HR / Legal | ✅ | Signed acknowledgments; hotline reports |
-| CC1.2 | Board exercises oversight | Board reviews security program ≥ annually; minutes documented | Board / CISO | ✅ | Board minutes |
-| CC1.3 | Establishes structure, authority, responsibility | Org chart; documented role descriptions; CISO charter | CISO / HR | ✅ | Org chart; role docs |
-| CC1.4 | Demonstrates commitment to competence | Background checks; annual security training; role-based training | HR / Security | ✅ | Training completion reports |
-| CC1.5 | Enforces accountability | Performance reviews include security objectives; disciplinary actions documented | HR | ✅ | HR records |
-
-### CC2 — Communication and Information
-
-| ID | Criterion | Control | Owner | Status | Evidence |
-|---|---|---|---|---|---|
-| CC2.1 | Obtains/uses relevant, quality information | Threat intel feeds; vendor risk data; vulnerability scanners | Security | ✅ | Tooling configs; reports |
-| CC2.2 | Communicates internally | Policies in central repo; quarterly all-hands security update; new-hire orientation | CISO | ✅ | Wiki, training records |
-| CC2.3 | Communicates externally | Trust Center website; customer breach notification process; subprocessor list | CISO / Legal | ✅ | Website; DPA templates |
-
-### CC3 — Risk Assessment
-
-| ID | Criterion | Control | Owner | Status | Evidence |
-|---|---|---|---|---|---|
-| CC3.1 | Specifies objectives | Annual security objectives in OKRs | CISO | ✅ | OKR doc |
-| CC3.2 | Identifies risks | Risk identification quarterly; ad-hoc on changes | Security | ✅ | Risk register |
-| CC3.3 | Considers fraud | Fraud risk assessment included in risk process | CISO + Finance | ✅ | Risk register |
-| CC3.4 | Identifies and assesses changes | Change risk assessment in CR process | Eng Leads | ✅ | PRs / CR records |
-
-### CC4 — Monitoring Activities
-
-| ID | Criterion | Control | Owner | Status | Evidence |
-|---|---|---|---|---|---|
-| CC4.1 | Selects/develops/performs evaluations | Quarterly internal control testing; annual external pen test; annual SOC 2 audit | GRC / CISO | ✅ | Test workpapers |
-| CC4.2 | Communicates deficiencies | Findings tracked in JIRA; reviewed monthly with leadership | CISO | ✅ | Issue tracker |
-
-### CC5 — Control Activities
-
-| ID | Criterion | Control | Owner | Status | Evidence |
-|---|---|---|---|---|---|
-| CC5.1 | Selects/develops control activities | Control matrix maintained (this doc) | GRC | ✅ | This document |
-| CC5.2 | Selects/develops technology controls | Documented in [`controls/technical-controls.md`](./technical-controls.md) | Security | ✅ | Tooling inventory |
-| CC5.3 | Deploys controls through policies | Policy library; annual review/approval | CISO | ✅ | Policy approvals |
-
-### CC6 — Logical and Physical Access
-
-| ID | Criterion | Control | Owner | Status | Evidence |
-|---|---|---|---|---|---|
-| CC6.1 | Restricts logical access | SSO + MFA; RBAC; least privilege; encryption | Security / IT | ✅ | IdP config; access matrix |
-| CC6.2 | Manages access provisioning/changes | Ticketed access requests; manager approval; quarterly access review | IT | ✅ | Tickets; review evidence |
-| CC6.3 | Removes access | Offboarding within 24h; deprovisioning checklist | IT / HR | ✅ | Offboarding logs |
-| CC6.4 | Restricts physical access | Badge access; visitor logs; data center via vendor SOC 2 | Facilities | ✅ | Badge logs |
-| CC6.5 | Disposes of physical assets | Asset disposal procedure; certificates of destruction | IT | ✅ | Disposal records |
-| CC6.6 | Protects against external threats | Firewall, WAF, DDoS protection, EDR | Security | ✅ | Tool configs |
-| CC6.7 | Restricts data movement | DLP (where applicable); encryption in transit; data egress controls | Security | ✅ | DLP reports |
-| CC6.8 | Prevents/detects malicious software | EDR on endpoints; container image scanning | Security | ✅ | EDR reports |
-
-### CC7 — System Operations
-
-| ID | Criterion | Control | Owner | Status | Evidence |
-|---|---|---|---|---|---|
-| CC7.1 | Detects vulnerabilities and anomalies | Continuous vuln scanning; SAST/DAST/SCA in CI; threat detection | Security | ✅ | Scan reports |
-| CC7.2 | Monitors for security events | SIEM; centralized logging; alerting | Security | ✅ | SIEM dashboards |
-| CC7.3 | Evaluates security events | Triage runbook; severity scoring | Security | ✅ | IR tickets |
-| CC7.4 | Responds to incidents | IR plan tested annually; post-incident reviews | Security | ✅ | Postmortems |
-| CC7.5 | Recovers from incidents | DR procedures; backup tested quarterly | Eng / Security | ✅ | DR test reports |
-
-### CC8 — Change Management
-
-| ID | Criterion | Control | Owner | Status | Evidence |
-|---|---|---|---|---|---|
-| CC8.1 | Authorizes/designs/develops/tests/approves/implements changes | Branch protection; peer review; CI; deployment pipeline | Engineering | ✅ | PR samples; CI logs |
-
-### CC9 — Risk Mitigation
-
-| ID | Criterion | Control | Owner | Status | Evidence |
-|---|---|---|---|---|---|
-| CC9.1 | Identifies/develops risk mitigation activities | Treatment plans in risk register; cyber insurance | CISO / Finance | ✅ | Insurance binder |
-| CC9.2 | Assesses/manages vendors | Vendor due diligence; annual reassessment; subprocessor list | GRC / Procurement | ✅ | Vendor register |
+| CM-1 | Segregation of Environments | Development, staging, and production environments are segregated. | Engineering | ✅ | Environment configs; network diagrams |
+| CM-2 | Secure Development Policy | A Secure Development Policy defines the requirements for secure software and system development and maintenance. | CISO | ✅ | Policy document |
+| CM-3 | Production Data Use is Restricted | Production data is not used in the development and testing environments, unless required for debugging customer issues. | Engineering | ✅ | Data handling procedures; access logs |
+| CM-4 | Software Change Testing | Software changes are tested prior to being deployed into production. | Engineering | ✅ | CI/CD logs; PR samples |
+| CM-5 | Baseline Configurations | Baseline configurations and codebases for production infrastructure, systems, and applications are securely managed. | Engineering / Security | ✅ | IaC configs; configuration audit reports |
+| CM-6 | Configuration and Asset Management Policy | A Configuration and Asset Management Policy governs configurations for new sensitive systems. | CISO | ✅ | Policy document |
+| CM-7 | Approval for System Changes | System changes are approved by at least 1 independent person prior to deployment into production. | Engineering | ✅ | PR approvals; branch protection settings |
+| CM-8 | Change Management Policy | A Change Management Policy governs the documenting, tracking, testing, and approving of system, network, security, and infrastructure changes. | CISO | ✅ | Policy document |
 
 ---
 
-## Availability (A)
+## Availability
 
-| ID | Criterion | Control | Owner | Status | Evidence |
+| ID | Control | Description | Owner | Status | Evidence |
 |---|---|---|---|---|---|
-| A1.1 | Maintains/monitors availability | SLA monitoring; multi-AZ; status page | SRE | ✅ | Uptime reports |
-| A1.2 | Authorizes/develops/tests recovery procedures | Backups encrypted, off-region, tested quarterly | SRE | ✅ | Restore test logs |
-| A1.3 | Tests recovery plan | Annual DR exercise; tabletop | SRE / CISO | ✅ | DR exercise reports |
+| AV-1 | Testing the Business Continuity and Disaster Recovery Plan | The Business Continuity and Disaster Recovery Plan is periodically tested via tabletop exercises or equivalents. When necessary, Management makes changes based on test results. | SRE / CISO | ✅ | DR exercise reports; tabletop records |
+| AV-2 | Business Continuity and Disaster Recovery Policy | Business Continuity and Disaster Recovery Policy governs required processes for restoring the service or supporting infrastructure after suffering a disaster or disruption. | CISO | ✅ | Policy document |
+| AV-3 | Uptime and Availability Monitoring | System tools monitor for uptime and availability based on predetermined criteria. | SRE | ✅ | Uptime reports; monitoring tool configs |
+| AV-4 | Backup Restoration Testing | Backed-up data is restored to a non-production environment at least annually to validate the integrity of backups. | SRE | ✅ | Restore test logs; backup reports |
 
 ---
 
-## Confidentiality (C)
+## Organizational Management
 
-| ID | Criterion | Control | Owner | Status | Evidence |
+| ID | Control | Description | Owner | Status | Evidence |
 |---|---|---|---|---|---|
-| C1.1 | Identifies/maintains confidential information | Data classification; data inventory | DPO | ✅ | Inventory |
-| C1.2 | Disposes of confidential information | Retention schedule; cryptographic erasure | DPO | ✅ | Retention logs |
+| OM-1 | Information Security Program Review | Management is responsible for the design, implementation, and management of the organization's security policies and procedures. Policies are reviewed by management at least annually. | CISO | ✅ | Annual review records; policy approval logs |
+| OM-2 | Organizational Chart | Management maintains a formal organizational chart to clearly identify positions of authority and lines of communication, and publishes it to internal personnel. | HR | ✅ | Org chart; internal publication records |
+| OM-3 | Performance Reviews | Internal personnel are evaluated via a formal performance review at least annually. | HR | ✅ | HR performance review records |
+| OM-4 | New Hire Screening | Hiring managers screen new hires or internal transfers to assess qualifications, experience, and competency. New hires sign confidentiality agreements upon hire. | HR | ✅ | Background check records; signed agreements |
+| OM-5 | Disciplinary Action | Personnel who violate information security policies are subject to disciplinary action, clearly documented in one or more policies. | HR | ✅ | Policy document; HR disciplinary records |
+| OM-6 | Performance Review Policy | A Performance Review Policy provides personnel context and transparency into their performance and career development processes. | HR | ✅ | Policy document |
+| OM-7 | Cybersecurity Insurance | Cybersecurity insurance has been procured to help minimize the financial impact of cybersecurity loss events. | CISO / Finance | ✅ | Insurance binder |
+| OM-8 | Roles and Responsibilities | Information security roles and responsibilities are outlined for personnel responsible for the security, availability, and confidentiality of the system. | CISO / HR | ✅ | Role descriptions; CISO charter |
+| OM-9 | Information Security Policy | An Information Security Policy establishes the security requirements for maintaining the security, confidentiality, integrity, and availability of applications, systems, infrastructure, and data. | CISO | ✅ | Policy document |
+| OM-10 | Acceptable Use Policy | An Acceptable Use Policy defines standards for appropriate and secure use of company hardware and electronic systems including storage media, communication tools, and internet access. | CISO / HR | ✅ | Policy document; signed acknowledgments |
+| OM-11 | Internal Control Policy | An Internal Control Policy identifies how a system of controls should be maintained to safeguard assets, promote operational efficiency, and encourage adherence to prescribed managerial policies. | CISO / GRC | ✅ | Policy document |
+| OM-12 | Code of Conduct | A Code of Conduct outlines ethical expectations, behavior standards, and ramifications of noncompliance. | HR / Legal | ✅ | Signed acknowledgments; hotline reports |
 
 ---
 
-## Processing Integrity (PI) *(if in scope)*
+## Confidentiality
 
-| ID | Criterion | Control | Owner | Status | Evidence |
+| ID | Control | Description | Owner | Status | Evidence |
 |---|---|---|---|---|---|
-| PI1.1 | Definitions of processed data | Data dictionary; API contracts | Eng | ⚪ | TBD |
-| PI1.2 | System inputs are complete/accurate | Input validation; schema enforcement | Eng | ⚪ | TBD |
-| PI1.3 | Processing is complete/accurate | Reconciliation jobs; error queues | Eng | ⚪ | TBD |
-| PI1.4 | Outputs are complete/accurate | Output validation; audit trails | Eng | ⚪ | TBD |
-| PI1.5 | Stored info is complete/accurate | Database integrity checks | Eng | ⚪ | TBD |
+| CO-1 | Data Classification Policy | A Data Classification Policy details the security and handling protocols for sensitive data. | DPO / CISO | ✅ | Policy document; data inventory |
+| CO-2 | Disposal of Customer Data | Upon customer request, data that is no longer needed is removed from databases and file stores in accordance with agreed-upon customer requirements. | DPO / Engineering | ✅ | Deletion request logs; confirmation records |
+| CO-3 | Data Retention and Disposal Policy | A Data Retention and Disposal Policy specifies how customer data is to be retained and disposed of based on compliance requirements and contractual obligations. | DPO / Legal | ✅ | Policy document; retention schedule |
+| CO-4 | Access to Customer Data is Restricted | Access to, erasure of, or destruction of customer data is restricted to personnel that need access based on the principle of least privilege. | Security / DPO | ✅ | Access control matrix; access logs |
 
 ---
 
-## Privacy (P) *(if in scope)*
+## Vulnerability Management
 
-| ID | Criterion | Control | Owner | Status | Evidence |
+| ID | Control | Description | Owner | Status | Evidence |
 |---|---|---|---|---|---|
-| P1 | Notice | Privacy notice published | DPO / Legal | ✅ | Privacy page |
-| P2 | Choice and consent | Cookie banner; consent records | DPO | ✅ | CMP logs |
-| P3 | Collection | Data minimization in design reviews | DPO / Eng | ✅ | DPIAs |
-| P4 | Use, retention, disposal | Retention schedule; auto-deletion | DPO | ✅ | Retention jobs |
-| P5 | Access | DSR portal; verification | DPO | ✅ | DSR logs |
-| P6 | Disclosure to third parties | Subprocessor list; DPAs | DPO / Legal | ✅ | Vendor register |
-| P7 | Quality | Update mechanisms; data correction | DPO | ✅ | DSR logs |
-| P8 | Monitoring and enforcement | Privacy audits; breach process | DPO | ✅ | Audit reports |
+| VM-1 | Vulnerability and Patch Management Policy | A Vulnerability Management and Patch Management Policy outlines the processes to efficiently respond to identified vulnerabilities. | CISO | ✅ | Policy document |
+| VM-2 | Third-Party Penetration Test | A 3rd party is engaged to conduct a network and application penetration test of the production environment at least annually. Critical and high-risk findings are tracked through resolution. | CISO / GRC | ✅ | Pentest report; findings tracker |
+
+---
+
+## Incident Response
+
+| ID | Control | Description | Owner | Status | Evidence |
+|---|---|---|---|---|---|
+| IR-1 | Tracking a Security Incident | Identified incidents are documented, tracked, and analyzed according to the Incident Response Plan. | Security | ✅ | IR tickets; incident log |
+| IR-2 | Lessons Learned | After any identified security incident has been resolved, management provides a "Lessons Learned" document to the team to continually improve security and operations. | CISO | ✅ | Postmortem documents |
+| IR-3 | Incident Response Plan Testing | The Incident Response Plan is periodically tested via tabletop exercises or equivalents. When necessary, Management makes changes based on test results. | CISO / Security | ✅ | Tabletop exercise records |
+| IR-4 | Incident Response Plan | An Incident Response Plan outlines the process of identifying, prioritizing, communicating, assigning, and tracking confirmed incidents through to resolution. | CISO | ✅ | IR Plan document |
+
+---
+
+## Risk Assessment
+
+| ID | Control | Description | Owner | Status | Evidence |
+|---|---|---|---|---|---|
+| RA-1 | Vendor Due Diligence Review | Vendor SOC 2 reports (or equivalent) are collected and reviewed on at least an annual basis. | GRC / Procurement | ✅ | Vendor review records; SOC 2 reports |
+| RA-2 | Risk Assessment | Formal risk assessments are performed, including identification of relevant internal and external threats related to security, availability, confidentiality, and fraud, and analysis of associated risks. | CISO / GRC | ✅ | Risk register; assessment workpapers |
+| RA-3 | Risk Assessment and Treatment Policy | A Risk Assessment and Treatment Policy governs the process for conducting risk assessments to account for threats, vulnerabilities, likelihood, and impact. Risk tolerance and strategies are also defined. | CISO | ✅ | Policy document |
+| RA-4 | Vendor Risk Assessment | New vendors are assessed in accordance with the Vendor Risk Management Policy prior to engagement. Reassessment occurs at least annually. | GRC / Procurement | ✅ | Vendor assessment records |
+| RA-5 | Risk Register | A risk register is maintained, which records the risk mitigation strategies for identified risks and the development or modification of controls consistent with the risk mitigation strategy. | CISO / GRC | ✅ | Risk register |
+| RA-6 | Vendor Risk Management Policy | A Vendor Risk Management Policy defines a framework for the onboarding and management of the vendor relationship lifecycle. | GRC / Legal | ✅ | Policy document |
+
+---
+
+## Network Security
+
+| ID | Control | Description | Owner | Status | Evidence |
+|---|---|---|---|---|---|
+| NS-1 | Network Security Policy | A Network Security Policy identifies the requirements for protecting information and systems within and across networks. | CISO | ✅ | Policy document |
+| NS-2 | Endpoint Security | Company endpoints are managed and configured with a strong password policy, anti-virus, and hard drive encryption. | Security / IT | ✅ | MDM configs; EDR reports |
+| NS-3 | Automated Alerting for Security Events | Alerting software is used to notify impacted teams of potential security events. | Security | ✅ | SIEM dashboards; alert configs |
+
+---
+
+## Access Security
+
+| ID | Control | Description | Owner | Status | Evidence |
+|---|---|---|---|---|---|
+| AS-1 | Administrative Access is Restricted | Administrative access to production infrastructure is restricted based on the principle of least privilege. | Security / IT | ✅ | Access matrix; privilege audit reports |
+| AS-2 | Access to Product is Restricted | Non-console access to production infrastructure is restricted to users with a unique SSH key or access key. | Security / Engineering | ✅ | SSH key inventory; access logs |
+| AS-3 | Removal of Access | Upon termination or when internal personnel no longer require access, system access is removed, as applicable. | IT / HR | ✅ | Offboarding checklists; deprovisioning logs |
+| AS-4 | Encryption-at-Rest | Service data is encrypted-at-rest. | Engineering / Security | ✅ | Encryption configs; tool documentation |
+| AS-5 | Asset Inventory | A list of system assets, components, and respective owners are maintained and reviewed at least annually. | IT / Security | ✅ | Asset inventory records |
+| AS-6 | User Access Reviews | System owners conduct scheduled user access reviews of production servers, databases, and applications to validate internal user access is commensurate with job responsibilities. | IT / Security | ✅ | Access review records |
+| AS-7 | Least Privilege in Use | Users are provisioned access to systems based on the principle of least privilege. | IT / Security | ✅ | Access provisioning tickets; RBAC configs |
+| AS-8 | Access Control and Termination Policy | An Access Control and Termination Policy governs authentication and access to applicable systems, data, and networks. | CISO | ✅ | Policy document |
+| AS-9 | Unique Access IDs | Personnel are assigned unique IDs to access sensitive systems, networks, and information. | IT / Security | ✅ | IdP user records; SSO configs |
+| AS-10 | Encryption and Key Management Policy | An Encryption and Key Management Policy supports the secure encryption and decryption of app secrets, and governs the use of cryptographic controls. | CISO / Security | ✅ | Policy document; key management records |
+
+---
+
+## Communications
+
+| ID | Control | Description | Owner | Status | Evidence |
+|---|---|---|---|---|---|
+| COM-1 | Terms of Service | Terms of Service or the equivalent are published or shared to external users. | Legal | ✅ | Published ToS; website |
+| COM-2 | Communication of Critical Information | Critical information is communicated to external parties, as applicable. | CISO / Legal | ✅ | Notification records; customer communications |
+| COM-3 | Confidential Reporting Channel | A confidential reporting channel is made available to internal personnel and external parties to report security and other identified concerns. | HR / CISO | ✅ | Whistleblower hotline records |
+| COM-4 | Communication of Security Commitments | Security commitments and expectations are communicated to both internal personnel and external users via the company's website. | CISO | ✅ | Trust Center website; internal wiki |
+| COM-5 | Description of Services | Descriptions of the company's services and systems are available to both internal personnel and external users. | CISO / Product | ✅ | Trust Center website; service documentation |
+| COM-6 | Privacy Policy | A Privacy Policy is available to both external users and internal personnel. This policy details the company's privacy commitments. | DPO / Legal | ✅ | Published Privacy Policy; website |
 
 ---
 
