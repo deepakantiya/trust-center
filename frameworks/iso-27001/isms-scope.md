@@ -4,15 +4,15 @@
 |---|---|
 | **Standard** | ISO/IEC 27001:2022, Clause 4.3 |
 | **Owner** | CISO |
-| **Version** | 1.0 |
-| **Effective** | YYYY-MM-DD |
+| **Version** | 2.0 |
+| **Effective** | 2026-05-04 |
 | **Review** | Annual |
 
 ---
 
 ## 1. Organization Overview
 
-[Organization Name] (hereinafter "the Organization") provides [brief description of products/services, e.g., "a SaaS platform for enterprise data analytics"]. The Organization operates from [primary location(s)] and delivers services to customers in [geographic markets].
+[Organization Name] provides [brief description of products/services]. The Organization operates from [primary location(s)] and delivers services to customers in [geographic markets].
 
 ---
 
@@ -20,115 +20,53 @@
 
 The ISMS covers the **design, development, operation, support, and security of the [Product/Platform Name] SaaS platform**, including:
 
-- All production infrastructure and cloud environments (AWS / GCP / Azure — specify)
-- Corporate IT systems used to access, develop, or support the platform
-- All personnel (employees, contractors, and managed service providers) with access to in-scope systems
+- All production infrastructure and cloud environments
+- Corporate IT systems with access to in-scope systems
+- All personnel (employees, contractors, managed service providers) with access
 - Physical office location(s): [list offices]
-- Third-party services integrated into the platform (see vendor register)
 
-### 2.1 In-Scope Systems
+---
 
-| System Category | Examples | Hosted |
+## 3. Trust Center Control Coverage
+
+The ISMS is supported by **58 Trust Center controls** documented in [`../../controls/control-matrix.md`](../../controls/control-matrix.md):
+
+| Control Category | Controls | ISO 27001 Alignment |
 |---|---|---|
-| Production application | API servers, web frontend, background jobs | Cloud (CSP) |
-| Data stores | Primary database, caches, object storage | Cloud (CSP) |
-| CI/CD pipeline | Build servers, artifact registry, deployment tools | Cloud + SaaS |
-| Corporate IT | Laptops, email, SSO, collaboration tools | SaaS + on-prem |
-| Security tooling | SIEM, EDR, vulnerability scanner, PAM | SaaS + cloud |
-| Corporate network | Office Wi-Fi, VPN | On-prem + cloud |
+| Change Management | CM-01 to CM-08 | Clause 8.25–8.33 |
+| Availability | AV-01 to AV-04 | Clause 5.29–5.30, 8.13–8.14 |
+| Organizational Management | OM-01 to OM-12 | Clause 5.1–5.37, 6.1–6.8 |
+| Confidentiality | CF-01 to CF-04 | Clause 5.12–5.13, 5.33 |
+| Vulnerability Management | VM-01, VM-02 | Clause 8.8 |
+| Incident Response | IR-01 to IR-04 | Clause 5.24–5.28 |
+| Risk Assessment | RA-01 to RA-06 | Clause 5.7, 5.19–5.23, 8.2 |
+| Network Security | NS-01 to NS-03 | Clause 8.7, 8.15–8.21 |
+| Access Security | AS-01 to AS-10 | Clause 5.15–5.18, 8.2–8.5 |
+| Communications | CO-01 to CO-06 | Clause 5.5, 5.34 |
 
-### 2.2 Out-of-Scope
+---
+
+## 4. Exclusions
 
 | Exclusion | Justification |
 |---|---|
-| Physical data centers | The Organization uses cloud providers; data center physical controls are covered by the CSP's own ISO 27001 certification (obtain annual SOC 2 / ISO cert from CSP) |
-| Legacy product [Name] | Scheduled for decommission by [date]; no customer data processed after [date] |
-| Personal devices (BYOD) | Organization issues all devices; BYOD not permitted for production access |
+| [Excluded area] | [Reason] |
 
 ---
 
-## 3. Internal and External Context (Clause 4.1)
+## 5. Interfaces
 
-### External Factors
-
-| Category | Relevant Factors |
-|---|---|
-| Regulatory | GDPR, CCPA, SOC 2, CMMC (if DoD supply chain), sector-specific regulations |
-| Competitive | Customer security questionnaires; ISO 27001 as differentiator |
-| Technology | Cloud-native architecture; open-source dependencies; AI/ML workloads |
-| Threat landscape | Ransomware; supply chain attacks; credential phishing; insider threats |
-
-### Internal Factors
-
-| Category | Relevant Factors |
-|---|---|
-| Products & services | [Product Name] SaaS; [other product lines] |
-| Organization structure | Engineering, Security, Legal, HR, Finance, Operations |
-| Culture | Remote-first; DevSecOps mindset; blameless postmortems |
-| Strategic direction | [Key growth initiatives, M&A activity, geographic expansion] |
-
----
-
-## 4. Interested Parties (Clause 4.2)
-
-| Party | Security Interests | How Addressed |
+| Interface | Description | Controls |
 |---|---|---|
-| Customers | Confidentiality of their data; platform availability; breach notification | DPA; SOC 2 report; Trust Center |
-| Employees | Privacy; secure working environment; clear security responsibilities | Policies; training; HR processes |
-| Regulators | Compliance with applicable laws | Legal register; DPIAs; GDPR controls |
-| Investors / Board | Risk exposure; compliance posture; incident resilience | Board security briefings; GRC reporting |
-| Suppliers / Partners | Clear security requirements; timely communication of incidents | Vendor security addenda; partner portal |
-| Auditors / Assessors | Access to evidence; transparency | Audit programme; evidence library |
+| Cloud Providers | IaaS/PaaS | RA-01, RA-04 (Vendor assessments) |
+| Third-Party Services | SaaS integrations | RA-01, RA-04, RA-06 |
+| Customers | API access | AS-02, CF-04, CO-01 |
 
 ---
 
-## 5. Interfaces and Dependencies
+## 6. Sign-Off
 
-| Interface | Description | Risk Consideration |
-|---|---|---|
-| Cloud Service Providers | AWS, GCP, or Azure hosting in-scope infrastructure | CSP shared-responsibility model; CSP SOC 2 / ISO cert required |
-| Identity Provider | Okta / Azure AD for SSO and MFA | Single point of failure for access; HA configuration required |
-| Version Control (GitHub) | Source code and CI/CD configuration | Supply chain risk; branch protection; SAST in CI |
-| Communication (Slack, Email) | Internal and customer communication | Phishing; data leakage; retention |
-| Monitoring (SIEM, APM) | Security and operational observability | Log integrity; alert fatigue |
-
----
-
-## 6. Scope Boundaries Diagram
-
-```text
-┌───────────────────────────────────────────────────────┐
-│                  ISMS SCOPE BOUNDARY                  │
-│                                                       │
-│  ┌──────────────┐   ┌───────────────┐   ┌──────────┐  │
-│  │  Production  │   │  Corporate IT │   │ Security │  │
-│  │  Cloud Env   │   │  (SaaS+Equip) │   │ Tooling  │  │
-│  └──────────────┘   └───────────────┘   └──────────┘  │
-│                                                       │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  All Personnel (Employees + Contractors)         │  │
-│  └──────────────────────────────────────────────────┘  │
-└───────────────────────────────────────────────────────┘
-          │                               │
-          ▼                               ▼
-  [Cloud Provider]               [SaaS Vendors]
-  (Out of scope —                (Risk-managed via
-  covered by CSP cert)           vendor register)
-```
-
----
-
-## 7. Approval
-
-| Role | Name | Signature | Date |
+| Role | Name | Date | Signature |
 |---|---|---|---|
 | CISO | | | |
-| CEO / DRI | | | |
-
----
-
-## Revision History
-
-| Version | Date | Author | Changes |
-|---|---|---|---|
-| 1.0 | YYYY-MM-DD | CISO | Initial scope definition |
+| Management Rep | | | |
