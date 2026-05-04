@@ -138,6 +138,95 @@ This matrix maps each AICPA Trust Services Criterion to the implemented control(
 
 ---
 
+
+
+---
+
+## Nametag Trust Center Controls Reference
+
+*Controls sourced from [Nametag Trust Center](https://trust.getnametag.com/monitoring) — mapped to SOC 2 TSC criteria.*
+
+### Change Management
+
+| Control | TSC Mapping | Description | Status |
+|---|---|---|---|
+| Segregation of Environments | CC8.1 | Development, staging, and production environments are logically separated | ✅ |
+| Secure Development Policy | CC8.1 | Documented secure software development lifecycle (SSDLC) policy | ✅ |
+| Production Data Use is Restricted | C1.1 | Production data is not used in non-production environments without masking | ✅ |
+
+### Availability
+
+| Control | TSC Mapping | Description | Status |
+|---|---|---|---|
+| Testing the Business Continuity and Disaster Recovery Plan | A1.3 | BC/DR plan is tested at least annually | ✅ |
+| Business Continuity and Disaster Recovery Policy | A1.2 | Documented BC/DR policy with RTO/RPO targets | ✅ |
+| Uptime and Availability Monitoring | A1.1 | Continuous monitoring of system availability with alerting | ✅ |
+
+### Organizational Management
+
+| Control | TSC Mapping | Description | Status |
+|---|---|---|---|
+| Information Security Program Review | CC4.1 | Security program reviewed at least annually by management | ✅ |
+| Organizational Chart | CC1.3 | Current organizational chart with security roles defined | ✅ |
+| Performance Reviews | CC1.5 | Regular performance reviews including security responsibilities | ✅ |
+
+### Confidentiality
+
+| Control | TSC Mapping | Description | Status |
+|---|---|---|---|
+| Data Classification Policy | C1.1 | Data classification scheme with handling requirements | ✅ |
+| Disposal of Customer Data | C1.2 | Secure disposal of customer data upon request or contract end | ✅ |
+| Data Retention and Disposal Policy | C1.2 | Documented retention periods and disposal procedures | ✅ |
+
+### Vulnerability Management
+
+| Control | TSC Mapping | Description | Status |
+|---|---|---|---|
+| Vulnerability and Patch Management Policy | CC7.1 | Policy for identifying, prioritizing, and remediating vulnerabilities | ✅ |
+| Third-Party Penetration Test | CC4.1 | Annual penetration testing by qualified third party | ✅ |
+
+### Incident Response
+
+| Control | TSC Mapping | Description | Status |
+|---|---|---|---|
+| Tracking a Security Incident | CC7.3 | Security incidents tracked through resolution | ✅ |
+| Lessons Learned | CC7.4 | Post-incident reviews conducted with documented lessons learned | ✅ |
+| Incident Response Plan Testing | CC7.4 | IR plan tested at least annually via tabletop or simulation | ✅ |
+
+### Risk Assessment
+
+| Control | TSC Mapping | Description | Status |
+|---|---|---|---|
+| Vendor Due Diligence Review | CC9.2 | Third-party vendors assessed for security risks | ✅ |
+| Risk Assessment | CC3.2 | Formal risk assessment performed at least annually | ✅ |
+| Risk Assessment and Treatment Policy | CC3.2 | Documented risk assessment methodology and treatment options | ✅ |
+
+### Network Security
+
+| Control | TSC Mapping | Description | Status |
+|---|---|---|---|
+| Network Security Policy | CC6.6 | Policy defining network security controls and architecture | ✅ |
+| Endpoint Security | CC6.8 | Endpoint detection and response (EDR) on all endpoints | ✅ |
+| Automated Alerting for Security Events | CC7.2 | SIEM/security monitoring with automated alerting | ✅ |
+
+### Access Security
+
+| Control | TSC Mapping | Description | Status |
+|---|---|---|---|
+| Administrative Access is Restricted | CC6.1 | Privileged access limited to authorized personnel with MFA | ✅ |
+| Access to Product is Restricted | CC6.1 | Production access controlled via RBAC and least privilege | ✅ |
+| Removal of Access | CC6.3 | Access removed within 24 hours of termination | ✅ |
+
+### Communications
+
+| Control | TSC Mapping | Description | Status |
+|---|---|---|---|
+| Terms of Service | CC2.3 | Published terms of service for customers | ✅ |
+| Communication of Critical Information | CC2.2 | Process for communicating security updates to stakeholders | ✅ |
+| Confidential Reporting Channel | CC1.1 | Anonymous whistleblower/reporting channel available | ✅ |
+
+---
+
 ## Maintenance
 
 - This matrix is reviewed at least quarterly and after any material change.
