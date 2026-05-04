@@ -57,18 +57,18 @@ Auditors select samples from populations. The larger the population, the larger 
 
 ### Per-Criterion Testing Guide
 
-| TSC Criterion | Control | Population | What Auditor Samples | Evidence Format |
-|---|---|---|---|---|
-| CC6.1 | MFA enforced for all users | All user accounts | Screenshots of MFA settings; AD / IdP config | IdP export + screenshot |
-| CC6.2 | Quarterly access reviews | 4 quarterly reviews | Review completion records; approver sign-off | Email/ticket + export |
-| CC6.3 | Access removed within 24h of termination | All terminations in period | HR offboarding tickets; IdP deprovisioning timestamp | HR system + IdP log |
-| CC6.6 | Vulnerability scans run monthly | 6 monthly scans | Scan reports (all systems); no critical CVEs unaddressed | Scan tool export |
-| CC7.2 | SIEM alerts reviewed daily | All alert days in period | Alert queue screenshots; on-call records | SIEM dashboard export |
-| CC7.4 | Incidents managed per IR plan | All incidents in period | IR tickets; postmortem docs; notification records | JIRA / ticketing system |
-| CC8.1 | Changes go through PR review | All production deployments | PRs with reviewer; CI passing; approval before merge | GitHub/GitLab PR list |
-| CC9.2 | Annual vendor review | All Tier 1 vendors | Vendor assessment records; risk ratings | GRC tool export |
-| A1.2 | Backups tested quarterly | 4 quarterly restore tests | Restore test runbook; success confirmation | Restore test records |
-| CC4.1 | Control testing conducted | Annual schedule | Test workpapers; findings and remediation | GRC workpapers |
+| TSC Criterion | Control | Population | What Auditor Samples | Evidence Format | Internal Control ID |
+|---|---|---|---|---|---|
+| CC6.1 | MFA enforced for all users | All user accounts | Screenshots of MFA settings; AD / IdP config | IdP export + screenshot | AS-1, AS-2, AS-7, AS-8, AS-9, AS-10 |
+| CC6.2 | Quarterly access reviews | 4 quarterly reviews | Review completion records; approver sign-off | Email/ticket + export | AS-6, AS-7 |
+| CC6.3 | Access removed within 24h of termination | All terminations in period | HR offboarding tickets; IdP deprovisioning timestamp | HR system + IdP log | AS-3 |
+| CC6.6 | Vulnerability scans run monthly | 6 monthly scans | Scan reports (all systems); no critical CVEs unaddressed | Scan tool export | NS-2 |
+| CC7.2 | SIEM alerts reviewed daily | All alert days in period | Alert queue screenshots; on-call records | SIEM dashboard export | NS-3 |
+| CC7.4 | Incidents managed per IR plan | All incidents in period | IR tickets; postmortem docs; notification records | JIRA / ticketing system | IR-1, IR-2, IR-3, IR-4 |
+| CC8.1 | Changes go through PR review | All production deployments | PRs with reviewer; CI passing; approval before merge | GitHub/GitLab PR list | CM-4, CM-5, CM-7, CM-8 |
+| CC9.2 | Annual vendor review | All Tier 1 vendors | Vendor assessment records; risk ratings | GRC tool export | RA-1, RA-4, RA-6 |
+| A1.2 | Backups tested quarterly | 4 quarterly restore tests | Restore test runbook; success confirmation | Restore test records | AV-4 |
+| CC4.1 | Control testing conducted | Annual schedule | Test workpapers; findings and remediation | GRC workpapers | OM-1, RA-2 |
 
 ---
 
@@ -97,15 +97,15 @@ An **exception** occurs when a sample fails the test. Exceptions do not automati
 
 Type II requires controls to operate *continuously* throughout the audit period. These controls should be automated or have automated evidence collection:
 
-| Control | Automation Status | Evidence Collection Method |
-|---|---|---|
-| MFA enforcement | ✅ Automated (IdP policy) | Monthly IdP config snapshot |
-| Vulnerability scanning | ✅ Automated (scanner) | Weekly scan reports auto-exported to `evidence/` |
-| SIEM alerting | ✅ Automated (SIEM) | Daily alert queue export; on-call acknowledgement logs |
-| Backup execution | ✅ Automated (backup tool) | Backup job success logs; monthly summary |
-| Access review | 🟡 Semi-automated (reminder + manual) | Quarterly calendar invite + signed-off export |
-| Offboarding deprovisioning | 🟡 Semi-automated (checklist + HR ticket) | HR ticket with deprovisioning timestamp |
-| Vendor review | 🔴 Manual | Annual calendar event + assessment records |
+| Control | Automation Status | Evidence Collection Method | Internal Control ID |
+|---|---|---|---|
+| MFA enforcement | ✅ Automated (IdP policy) | Monthly IdP config snapshot | AS-1, AS-9 |
+| Vulnerability scanning | ✅ Automated (scanner) | Weekly scan reports auto-exported to `evidence/` | VM-1, VM-2 |
+| SIEM alerting | ✅ Automated (SIEM) | Daily alert queue export; on-call acknowledgement logs | NS-3 |
+| Backup execution | ✅ Automated (backup tool) | Backup job success logs; monthly summary | AV-4 |
+| Access review | 🟡 Semi-automated (reminder + manual) | Quarterly calendar invite + signed-off export | AS-6, AS-7 |
+| Offboarding deprovisioning | 🟡 Semi-automated (checklist + HR ticket) | HR ticket with deprovisioning timestamp | AS-3 |
+| Vendor review | 🔴 Manual | Annual calendar event + assessment records | RA-1, RA-4, RA-6 |
 
 ---
 

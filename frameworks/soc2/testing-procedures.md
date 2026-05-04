@@ -25,6 +25,7 @@ Run these procedures **quarterly** as an internal control test. Document finding
 | Field | Detail |
 |---|---|
 | **Criterion** | CC1.1 |
+| **Internal Control Ref** | OM-12 |
 | **Objective** | Verify all active employees have signed the Code of Conduct in the current annual period |
 | **Procedure** | 1. Pull list of all active employees from HR system. 2. Pull Code of Conduct acknowledgement list from HR/LMS. 3. Compare: identify any employees who have not signed. 4. For new hires (<90 days), confirm they signed at onboarding. |
 | **Pass criteria** | 100% of employees with tenure >90 days have a signed acknowledgement dated within the last 12 months |
@@ -39,6 +40,7 @@ Run these procedures **quarterly** as an internal control test. Document finding
 | Field | Detail |
 |---|---|
 | **Criterion** | CC1.4 |
+| **Internal Control Ref** | OM-1, OM-4, OM-6 |
 | **Objective** | Verify all employees completed annual security awareness training |
 | **Procedure** | 1. Pull training completion report from LMS for the last 12 months. 2. Compare against current active employee list. 3. Note any employees >12 months since last completion. |
 | **Pass criteria** | ≥95% completion rate; any incomplete employees have a training assignment active and a due date within 30 days |
@@ -53,6 +55,7 @@ Run these procedures **quarterly** as an internal control test. Document finding
 | Field | Detail |
 |---|---|
 | **Criterion** | CC6.1 |
+| **Internal Control Ref** | AS-1, AS-2, AS-7, AS-8, AS-9, AS-10 |
 | **Objective** | Confirm MFA is enforced for all user accounts accessing production systems |
 | **Procedure** | 1. Log into IdP admin console (Okta / Azure AD). 2. Navigate to MFA policy settings. 3. Screenshot MFA policy showing "Required for all users." 4. Pull list of any MFA exceptions. 5. Verify exceptions have compensating controls and CISO approval. |
 | **Pass criteria** | MFA policy set to "Required"; zero unapproved exceptions |
@@ -65,6 +68,7 @@ Run these procedures **quarterly** as an internal control test. Document finding
 | Field | Detail |
 |---|---|
 | **Criterion** | CC6.2 |
+| **Internal Control Ref** | AS-6, AS-7 |
 | **Objective** | Confirm quarterly access reviews were completed for all in-scope systems |
 | **Procedure** | 1. Identify the most recent quarterly access review (should be within 90 days). 2. Obtain the completed review record (manager-signed export). 3. Verify all system owners / managers participated. 4. Confirm any excess privileges identified were revoked (pull deprovisioning tickets). |
 | **Pass criteria** | Review completed within the quarter; all identified excess privileges revoked within 7 business days |
@@ -77,6 +81,7 @@ Run these procedures **quarterly** as an internal control test. Document finding
 | Field | Detail |
 |---|---|
 | **Criterion** | CC6.3 |
+| **Internal Control Ref** | AS-3 |
 | **Objective** | Confirm terminated employees had all access revoked within 24 hours of termination |
 | **Procedure** | 1. Pull list of terminations in the last quarter from HR. 2. For a sample (min 5 or 100% if <5), obtain: HR termination timestamp + IdP deprovisioning timestamp. 3. Calculate time delta. 4. Check GitHub, Slack, and other critical tools separately if not SSO-federated. |
 | **Pass criteria** | All sampled terminations: IdP deprovisioned ≤24h from termination timestamp |
@@ -89,6 +94,7 @@ Run these procedures **quarterly** as an internal control test. Document finding
 | Field | Detail |
 |---|---|
 | **Criterion** | CC6.6, CC7.1 |
+| **Internal Control Ref** | NS-2, VM-1, VM-2 |
 | **Objective** | Confirm vulnerability scans ran on all production systems at least monthly |
 | **Procedure** | 1. Log into vulnerability scanner (Qualys / Tenable / Wiz). 2. Pull scan history for the last 90 days. 3. Confirm all production IP ranges / cloud assets are in scope. 4. Verify scan frequency ≥ monthly per asset group. 5. Review Critical/High findings: confirm all are tracked with patch dates within SLA. |
 | **Pass criteria** | Monthly scans complete; zero unaddressed Critical CVEs >48h old; zero unaddressed High CVEs >7 days old |
@@ -103,6 +109,7 @@ Run these procedures **quarterly** as an internal control test. Document finding
 | Field | Detail |
 |---|---|
 | **Criterion** | CC7.2 |
+| **Internal Control Ref** | NS-3 |
 | **Objective** | Confirm security events are logged and alerts are reviewed daily |
 | **Procedure** | 1. Log into SIEM (Splunk / Datadog / Sentinel). 2. Pull alert history for last 30 days. 3. Confirm on-call acknowledgement within SLA for each alert. 4. Spot-check log ingestion: verify all critical log sources active (cloud trail, IdP, endpoint). |
 | **Pass criteria** | All P1/P2 alerts acknowledged within 15 minutes; all P3 within 4 hours; no log source gaps >1 hour |
@@ -115,6 +122,7 @@ Run these procedures **quarterly** as an internal control test. Document finding
 | Field | Detail |
 |---|---|
 | **Criterion** | CC7.4 |
+| **Internal Control Ref** | IR-1, IR-2, IR-3, IR-4 |
 | **Objective** | Verify all security incidents were handled per the IR plan with documented postmortems |
 | **Procedure** | 1. Pull list of all security incidents from ticketing system (last quarter). 2. For each P1/P2, confirm: postmortem document exists; lessons learned captured; root cause addressed. 3. Verify incident notification SLAs met (customer notification ≤72h for breaches). |
 | **Pass criteria** | All incidents have IR ticket + postmortem (P1/P2); notification SLAs met |
@@ -129,6 +137,7 @@ Run these procedures **quarterly** as an internal control test. Document finding
 | Field | Detail |
 |---|---|
 | **Criterion** | CC8.1 |
+| **Internal Control Ref** | CM-4, CM-5, CM-7, CM-8 |
 | **Objective** | Confirm all production deployments went through peer review and CI before merge |
 | **Procedure** | 1. Pull list of all production deployments in the last quarter (release log / deployment pipeline). 2. Select a sample (25 if population >50). 3. For each: locate the associated PR. 4. Verify: ≥1 reviewer approved; CI checks passed; no direct push to main branch. |
 | **Pass criteria** | 100% of sampled deployments have peer review + CI pass; zero direct pushes to main |
@@ -143,6 +152,7 @@ Run these procedures **quarterly** as an internal control test. Document finding
 | Field | Detail |
 |---|---|
 | **Criterion** | A1.2 |
+| **Internal Control Ref** | AV-4 |
 | **Objective** | Confirm backups run daily and restores are tested quarterly |
 | **Procedure** | 1. Pull backup job history for the last quarter. 2. Confirm daily backup jobs completed successfully (no failures >24h unresolved). 3. Obtain the most recent restore test record. 4. Confirm restore test was completed within the last 90 days. 5. Verify restore test covers at least one critical database. |
 | **Pass criteria** | Daily backups ≥98% success rate; restore test completed within 90 days with documented pass |
