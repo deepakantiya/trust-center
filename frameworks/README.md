@@ -11,59 +11,46 @@ This directory contains onboarding documentation, control mappings, assessment w
 | **ISO/SAE 21434:2021** | ISO / SAE | Automotive OEMs & suppliers | [`iso-sae-21434/control-mapping.md`](iso-sae-21434/control-mapping.md) |
 | **CMMC Level 1** | DoD / CMMC AB | DoD suppliers handling FCI | [`cmmc/level-1-assessment.md`](cmmc/level-1-assessment.md) |
 | **CMMC Level 2** | DoD / CMMC AB | DoD suppliers handling CUI | [`cmmc/level-2-assessment.md`](cmmc/level-2-assessment.md) |
-
-## Trust Services Criteria Coverage
-
-The control matrix (`../controls/control-matrix.md`) covers all five TSC categories:
-
-| Category | Criteria | Scope |
-|---|---|---|
-| **Security (CC)** | CC1–CC9 | Always in scope |
-| **Availability (A)** | A1 | In scope for SLAs |
-| **Confidentiality (C)** | C1 | In scope for confidential data handling |
-| **Processing Integrity (PI)** | PI1 | In scope for transaction-processing systems |
-| **Privacy (P)** | P1–P8 | In scope for PII processing |
+| **NIST SP 800-53** | NIST | Federal / enterprise | [`nist-800-53/control-mapping.md`](nist-800-53/control-mapping.md) |
 
 ---
 
-## Cross-Framework Control Map
+## Trust Center Controls Reference
 
-[`cross-framework-map.md`](cross-framework-map.md) shows, for every major control domain, which specific requirements across **all five** frameworks are satisfied by the same underlying control. Use it to:
+The control matrix (`../controls/control-matrix.md`) contains **58 Trust Center controls** across 10 categories:
 
-- Identify shared evidence that satisfies multiple auditors simultaneously
-- Spot gaps where a control satisfies one framework but not another
-- Prioritize remediation for maximum multi-framework coverage
+| Category | Control IDs | Count |
+|---|---|---|
+| Change Management | CM-01 to CM-08 | 8 |
+| Availability | AV-01 to AV-04 | 4 |
+| Organizational Management | OM-01 to OM-12 | 12 |
+| Confidentiality | CF-01 to CF-04 | 4 |
+| Vulnerability Management | VM-01 to VM-02 | 2 |
+| Incident Response | IR-01 to IR-04 | 4 |
+| Risk Assessment | RA-01 to RA-06 | 6 |
+| Network Security | NS-01 to NS-03 | 3 |
+| Access Security | AS-01 to AS-10 | 10 |
+| Communications | CO-01 to CO-06 | 6 |
+| **Total** | | **58** |
 
-## Quick Start by Role
+---
 
-### Auditor / Assessor
-1. Start with `cross-framework-map.md` to understand control coverage
-2. Navigate to the framework subfolder for the specific assessment
-3. Reference `../controls/control-matrix.md` for the SOC 2 TSC baseline
-4. Pull evidence from `../evidence/`
+## How to Use This Directory
 
-### GRC / Compliance Engineer
-1. Run `python scripts/framework_gap_check.py --all` to generate a gap report
-2. Open the relevant framework's assessment file to see current status
-3. Open `cmmc/poam.md` or the relevant risk-treatment file for remediation tracking
+1. **Single source of truth** — [`cross-framework-map.md`](cross-framework-map.md) shows how each Trust Center control satisfies multiple frameworks.
+2. **Per-framework workbooks** — Each subdirectory contains assessment checklists, scoping statements, and templates specific to that standard.
+3. **Pre-audit testing** — Use [`soc2/testing-procedures.md`](soc2/testing-procedures.md) to run quarterly internal tests against all 58 controls.
+4. **Gap analysis** — Compare your current state against each framework's requirements using the mapping tables.
+5. **Evidence collection** — Each control specifies required evidence in the control matrix.
 
-### CISO / Program Owner
-1. Read the `README.md` in each framework subfolder for executive summary
-2. Review `cross-framework-map.md` for shared-effort opportunities
-3. Track open gaps via `cmmc/poam.md` (generic enough for any framework)
+---
 
-## Status Legend
+## Quick Links
 
-| Symbol | Meaning |
+| Document | Purpose |
 |---|---|
-| ✅ | Implemented and operating effectively |
-| 🟡 | Partially implemented — gaps exist |
-| 🔴 | Not implemented — remediation required |
-| ⚪ | Not applicable / out of scope |
-| 📋 | Planned — target date set |
-
-## Maintenance
-
-- Framework files are reviewed **annually** and after any material change to scope, products, or processes.
-- The cross-framework map is regenerated whenever a new control is added to `controls/control-matrix.md`.
-- Gap statuses are updated in the relevant assessment file after each internal audit cycle.
+| [`../controls/control-matrix.md`](../controls/control-matrix.md) | Master control list with owners and evidence |
+| [`cross-framework-map.md`](cross-framework-map.md) | Maps Trust Center controls to all frameworks |
+| [`soc2/testing-procedures.md`](soc2/testing-procedures.md) | 58 internal test procedures |
+| [`soc2/type2-readiness.md`](soc2/type2-readiness.md) | SOC 2 Type II audit preparation |
+| [`cmmc/poam.md`](cmmc/poam.md) | Plan of Action & Milestones template |
