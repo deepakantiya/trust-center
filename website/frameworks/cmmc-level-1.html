@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CMMC Level 1 Practices | Trust Center</title>
-  <meta name="description" content="CMMC 2.0 Level 1 — 17 practices from FAR 52.204-21 mapped to NIST SP 800-171 and NIST SP 800-53 Rev 5.">
+  <title>CMMC Level 1 | Trust Center</title>
+  <meta name="description" content="CMMC Level 1 compliance with 17 practices mapped to Trust Center controls.">
   <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
       <a href="../index.html" class="brand">[Company] · Trust Center</a>
       <nav>
         <a href="../index.html#frameworks">Frameworks</a>
-        <a href="../index.html#security">Controls</a>
+        <a href="../index.html#controls">Controls</a>
         <a href="../subprocessors.html">Subprocessors</a>
         <a href="../security.html">Report Vulnerability</a>
       </nav>
@@ -24,24 +24,20 @@
     <div class="container">
       <nav class="breadcrumb">
         <a href="../index.html">Trust Center</a> &rsaquo;
-        <a href="../index.html#frameworks">Compliance Frameworks</a> &rsaquo;
+        <a href="../index.html#frameworks">Frameworks</a> &rsaquo;
         <span>CMMC Level 1</span>
       </nav>
       <div class="domain-title">
         <span class="domain-icon">🛡️</span>
         <div>
-          <h1>CMMC 2.0 Level 1</h1>
-          <p class="lead">17 practices safeguarding Federal Contract Information (FCI) — mapped to NIST 800-171 and NIST 800-53 Rev 5</p>
+          <h1>CMMC Level 1</h1>
+          <p class="lead">Basic Safeguarding of Federal Contract Information (FCI)</p>
         </div>
       </div>
       <div class="domain-meta">
         <div class="domain-stat"><span class="stat-num">17</span><span class="stat-label">Practices</span></div>
-        <div class="domain-stat"><span class="stat-num">16</span><span class="stat-label">MET</span></div>
-        <div class="domain-stat"><span class="stat-num">1</span><span class="stat-label">Partial</span></div>
-        <div class="framework-coverage">
-          <span class="fw-chip fw-cmmc1">CMMC L1</span>
-          <span class="fw-chip fw-soc2">→ NIST 800-53</span>
-        </div>
+        <div class="domain-stat"><span class="stat-num">17/17</span><span class="stat-label">Implemented</span></div>
+        <div class="domain-stat"><span class="stat-num">Annual</span><span class="stat-label">Self-Assessment</span></div>
       </div>
     </div>
   </section>
@@ -49,76 +45,42 @@
   <section class="section">
     <div class="container">
       <p class="controls-intro">
-        CMMC Level 1 covers 17 practices derived from FAR 52.204-21 basic safeguarding requirements. Each practice maps to a NIST SP 800-171 reference and to its NIST SP 800-53 Rev 5 control equivalent. Annual self-assessment with results submitted to SPRS. Source: <code>frameworks/cmmc/level-1-assessment.md</code>.
+        CMMC Level 1 requires 17 basic safeguarding practices across 6 domains. Our Trust Center controls provide complete coverage for self-assessment compliance.
       </p>
 
-      <h3 style="margin-top:32px;">AC — Access Control (4)</h3>
+      <h3>Domain Mapping</h3>
       <div class="controls-table-wrap">
         <table class="controls-table">
-          <thead><tr><th>Practice</th><th class="td-name">Description</th><th>NIST 800-171</th><th>NIST 800-53</th><th>Status</th></tr></thead>
+          <thead><tr><th>Domain</th><th>Practices</th><th>Trust Center Controls</th></tr></thead>
           <tbody>
-            <tr><td><span class="ctrl-id">AC.1.001</span></td><td class="td-name">Limit system access to authorized users, processes, and devices</td><td class="ctrl-map">3.1.1</td><td class="ctrl-map">AC-2, AC-3</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">AC.1.002</span></td><td class="td-name">Limit access to types of transactions and functions authorized users may execute</td><td class="ctrl-map">3.1.2</td><td class="ctrl-map">AC-3, AC-6</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">AC.1.003</span></td><td class="td-name">Verify and control connections to external information systems</td><td class="ctrl-map">3.1.20</td><td class="ctrl-map">AC-20, SC-7</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">AC.1.004</span></td><td class="td-name">Control information posted or processed on publicly accessible systems</td><td class="ctrl-map">3.1.22</td><td class="ctrl-map">AC-22</td><td><span class="status-impl">✅ MET</span></td></tr>
+            <tr><td><strong>AC — Access Control</strong></td><td>4</td><td>AS-01, AS-03, AS-06, AS-07, CF-04</td></tr>
+            <tr><td><strong>IA — Identification</strong></td><td>2</td><td>AS-09</td></tr>
+            <tr><td><strong>MP — Media Protection</strong></td><td>1</td><td>CF-02, CF-03</td></tr>
+            <tr><td><strong>PE — Physical Protection</strong></td><td>3</td><td>Cloud provider responsibility</td></tr>
+            <tr><td><strong>SC — System & Comm</strong></td><td>2</td><td>AS-04, NS-01</td></tr>
+            <tr><td><strong>SI — System Integrity</strong></td><td>4</td><td>VM-01, NS-02, NS-03</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h3 style="margin-top:32px;">IA — Identification &amp; Authentication (2)</h3>
+      <h3 style="margin-top:32px;">Practice-Level Mapping</h3>
       <div class="controls-table-wrap">
         <table class="controls-table">
-          <thead><tr><th>Practice</th><th class="td-name">Description</th><th>NIST 800-171</th><th>NIST 800-53</th><th>Status</th></tr></thead>
+          <thead><tr><th>Practice</th><th>Description</th><th>Trust Center</th></tr></thead>
           <tbody>
-            <tr><td><span class="ctrl-id">IA.1.076</span></td><td class="td-name">Identify users, processes, and devices</td><td class="ctrl-map">3.5.1</td><td class="ctrl-map">IA-2, IA-4</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">IA.1.077</span></td><td class="td-name">Authenticate identities before allowing access</td><td class="ctrl-map">3.5.2</td><td class="ctrl-map">IA-2, IA-5</td><td><span class="status-impl">✅ MET</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 style="margin-top:32px;">MP — Media Protection (1)</h3>
-      <div class="controls-table-wrap">
-        <table class="controls-table">
-          <thead><tr><th>Practice</th><th class="td-name">Description</th><th>NIST 800-171</th><th>NIST 800-53</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td><span class="ctrl-id">MP.1.001</span></td><td class="td-name">Sanitize or destroy media before disposal or reuse</td><td class="ctrl-map">3.8.3</td><td class="ctrl-map">MP-6</td><td><span class="status-impl">✅ MET</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 style="margin-top:32px;">PE — Physical Protection (6)</h3>
-      <div class="controls-table-wrap">
-        <table class="controls-table">
-          <thead><tr><th>Practice</th><th class="td-name">Description</th><th>NIST 800-171</th><th>NIST 800-53</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td><span class="ctrl-id">PE.1.131</span></td><td class="td-name">Limit physical access to authorized individuals</td><td class="ctrl-map">3.10.1</td><td class="ctrl-map">PE-2, PE-3</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">PE.1.132</span></td><td class="td-name">Protect and monitor physical facility and infrastructure</td><td class="ctrl-map">3.10.2</td><td class="ctrl-map">PE-6</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">PE.1.133</span></td><td class="td-name">Escort visitors and monitor visitor activity</td><td class="ctrl-map">3.10.3</td><td class="ctrl-map">PE-3</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">PE.1.134</span></td><td class="td-name">Maintain audit logs of physical access</td><td class="ctrl-map">3.10.4</td><td class="ctrl-map">PE-8</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">PE.1.135</span></td><td class="td-name">Control and manage physical access devices</td><td class="ctrl-map">3.10.5</td><td class="ctrl-map">PE-3</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">PE.1.136</span></td><td class="td-name">Enforce safeguarding measures for CUI at alternate work sites</td><td class="ctrl-map">3.10.6</td><td class="ctrl-map">PE-17</td><td><span class="status-partial">🟡 Partial</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 style="margin-top:32px;">SC — System &amp; Communications Protection (2)</h3>
-      <div class="controls-table-wrap">
-        <table class="controls-table">
-          <thead><tr><th>Practice</th><th class="td-name">Description</th><th>NIST 800-171</th><th>NIST 800-53</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td><span class="ctrl-id">SC.1.175</span></td><td class="td-name">Monitor, control, and protect communications at external boundaries</td><td class="ctrl-map">3.13.1</td><td class="ctrl-map">SC-7, AC-4</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">SC.1.176</span></td><td class="td-name">Implement subnetworks for publicly accessible system components</td><td class="ctrl-map">3.13.5</td><td class="ctrl-map">SC-7</td><td><span class="status-impl">✅ MET</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h3 style="margin-top:32px;">SI — System &amp; Information Integrity (2)</h3>
-      <div class="controls-table-wrap">
-        <table class="controls-table">
-          <thead><tr><th>Practice</th><th class="td-name">Description</th><th>NIST 800-171</th><th>NIST 800-53</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td><span class="ctrl-id">SI.1.210</span></td><td class="td-name">Identify, report, and correct system flaws in a timely manner</td><td class="ctrl-map">3.14.1</td><td class="ctrl-map">SI-2, RA-5</td><td><span class="status-impl">✅ MET</span></td></tr>
-            <tr><td><span class="ctrl-id">SI.1.211</span></td><td class="td-name">Provide protection from malicious code at appropriate locations</td><td class="ctrl-map">3.14.2</td><td class="ctrl-map">SI-3</td><td><span class="status-impl">✅ MET</span></td></tr>
+            <tr><td>AC.1.001</td><td>Limit system access to authorized users</td><td>CF-04, AS-06</td></tr>
+            <tr><td>AC.1.002</td><td>Limit access to functions authorized users are permitted to execute</td><td>AS-01, AS-07</td></tr>
+            <tr><td>AC.1.003</td><td>Verify and control connections to external systems</td><td>NS-01</td></tr>
+            <tr><td>AC.1.004</td><td>Control information posted to publicly accessible systems</td><td>AS-03, AS-08</td></tr>
+            <tr><td>IA.1.076</td><td>Identify system users and processes</td><td>AS-09</td></tr>
+            <tr><td>IA.1.077</td><td>Authenticate identities before allowing access</td><td>AS-09, AS-02</td></tr>
+            <tr><td>MP.1.118</td><td>Sanitize or destroy media before disposal</td><td>CF-02, CF-03</td></tr>
+            <tr><td>SC.1.175</td><td>Monitor and protect communications at boundaries</td><td>NS-01, NS-03</td></tr>
+            <tr><td>SC.1.176</td><td>Implement subnetworks for publicly accessible components</td><td>NS-01, CM-01</td></tr>
+            <tr><td>SI.1.210</td><td>Identify, report, and correct system flaws</td><td>VM-01</td></tr>
+            <tr><td>SI.1.211</td><td>Provide malicious code protection</td><td>NS-02</td></tr>
+            <tr><td>SI.1.212</td><td>Update malicious code protection mechanisms</td><td>NS-02, VM-01</td></tr>
+            <tr><td>SI.1.213</td><td>Perform periodic and real-time scans</td><td>NS-02, NS-03</td></tr>
           </tbody>
         </table>
       </div>
@@ -126,15 +88,9 @@
   </section>
 
   <footer class="site-footer">
-    <div class="container footer-inner">
-      <span>© <span id="year"></span> [Company Name]. All rights reserved.</span>
-      <nav>
-        <a href="../index.html">Trust Center</a>
-        <a href="../index.html#frameworks">All Frameworks</a>
-        <a href="../security.html">Security</a>
-      </nav>
+    <div class="container">
+      <p>&copy; 2024 [Company Name]. All rights reserved.</p>
     </div>
   </footer>
-  <script src="../js/site.js"></script>
 </body>
 </html>
