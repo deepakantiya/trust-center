@@ -1115,18 +1115,21 @@
 
         // Show success page with download links
         function showSuccessPage(result) {
-            // Hide form
-            const formContainer = document.querySelector('.form-container') || document.getElementById('document-request-form')?.parentElement;
-            if (formContainer) {
-                formContainer.style.display = 'none';
+            // Hide just the form, not the container (so success div remains visible)
+            const form = document.getElementById('document-request-form');
+            if (form) {
+                form.style.display = 'none';
             }
             
-            // Show or create success container
+            // Get or create success container
             let successDiv = document.getElementById('request-success');
             if (!successDiv) {
+                const formContainer = document.getElementById('request-form-container');
                 successDiv = document.createElement('div');
                 successDiv.id = 'request-success';
-                formContainer?.parentElement?.appendChild(successDiv);
+                if (formContainer) {
+                    formContainer.appendChild(successDiv);
+                }
             }
             
             const expiresDate = new Date(result.expiresAt).toLocaleDateString('en-US', {
