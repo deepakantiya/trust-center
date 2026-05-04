@@ -204,6 +204,58 @@ Maps every major control domain to specific requirements across all six framewor
 
 ---
 
+---
+
+## 15. Privacy (P)
+
+*SOC 2 Privacy criteria for organizations processing personal information.*
+
+| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|
+| Privacy notice published and accessible | P1 | 5.34 | — | — | — | PT-5, TR-1 |
+| Choice and consent mechanisms | P2 | 5.34 | — | — | — | IP-1, IP-2 |
+| Data collection limitation | P3 | 5.34 | — | — | — | IP-1, AP-2 |
+| Use, retention, and disposal | P4 | 5.34 | — | — | — | DM-2, SI-12, MP-6 |
+| Data subject access requests | P5 | 5.34 | — | — | — | IP-3, IP-4 |
+| Disclosure and sharing with third parties | P6 | 5.34, 5.19 | — | — | — | AR-3, UL-2 |
+| Data quality and accuracy | P7 | 5.34 | — | — | — | DI-1, DI-2 |
+| Privacy monitoring and enforcement | P8 | 5.34 | — | — | — | AR-4, PM-26 |
+
+---
+
+## 16. Processing Integrity (PI)
+
+*SOC 2 Processing Integrity criteria — typically in scope for transaction-processing systems.*
+
+| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|
+| Data processing definitions and documentation | PI1.1 | 8.1 | — | — | — | SA-4, SI-1 |
+| Input validation and completeness | PI1.2 | 8.25, 8.28 | 10.4.2 | — | — | SI-10 |
+| Processing accuracy and completeness | PI1.3 | 8.1, 8.25 | 10.4.2 | — | — | SI-10, SI-16 |
+| Output validation and accuracy | PI1.4 | 8.1 | — | — | — | SI-15 |
+| Stored data integrity verification | PI1.5 | 8.24, 8.10 | — | — | — | SI-7 |
+
+---
+
+## 17. Additional Common Criteria Controls
+
+*Additional SOC 2 Common Criteria controls not covered in domain-specific sections above.*
+
+| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|
+| Commitment to integrity and ethical values | CC1.1 | 5.4 | 5.4.1 | — | — | PL-4, PS-8 |
+| Board / executive oversight | CC1.2 | 5.4 | 5.4.1 | — | — | PM-1, PM-2 |
+| Uses quality information for decisions | CC2.1 | 5.7 | — | — | — | PM-16, RA-3 |
+| External communication of security posture | CC2.3 | 5.6 | 5.4.4 | — | IR.2.092 | PM-15 |
+| Security objectives specification | CC3.1 | 6.2 | — | — | — | PL-2, PM-9 |
+| Fraud risk consideration | CC3.3 | 5.7 | — | — | — | RA-3, SI-4 |
+| Change impact assessment | CC3.4 | 8.32 | 9.3 | — | CM.3.068 | CM-3, RA-3 |
+| Deficiency communication and remediation | CC4.2 | 9.3, 10.2 | — | — | CA.2.158 | CA-5 |
+| Incident recovery procedures | CC7.5 | 5.30 | — | — | RE.3.139 | CP-10, IR-4 |
+| Confidential information disposal | C1.2 | 8.10, 7.14 | — | MP.1.001 | MP.1.001 | MP-6, SI-12 |
+
+---
+
 ## Shared Evidence Register
 
 The following evidence artifacts satisfy **multiple frameworks simultaneously**. Collect once, cite everywhere.
