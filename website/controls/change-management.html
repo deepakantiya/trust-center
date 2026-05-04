@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Change Management Controls | Trust Center</title>
+  <meta name="description" content="Trust Center Change Management controls mapped to SOC 2, ISO 27001, and CMMC frameworks.">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">[Company] · Trust Center</a>
+      <nav>
+        <a href="../index.html#controls">Controls</a>
+        <a href="../index.html#frameworks">Frameworks</a>
+        <a href="../subprocessors.html">Subprocessors</a>
+        <a href="../security.html">Report Vulnerability</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="domain-hero">
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="../index.html">Trust Center</a> &rsaquo;
+        <a href="../index.html#controls">Controls</a> &rsaquo;
+        <span>Change Management</span>
+      </nav>
+      <div class="domain-title">
+        <span class="domain-icon">🔄</span>
+        <div>
+          <h1>Change Management Controls</h1>
+          <p class="lead">Controls governing environment segregation, secure development, configuration management, and change approval processes.</p>
+        </div>
+      </div>
+      <div class="domain-meta">
+        <div class="domain-stat"><span class="stat-num">8</span><span class="stat-label">Controls</span></div>
+        <div class="domain-stat"><span class="stat-num">8/8</span><span class="stat-label">Implemented</span></div>
+        <div class="domain-stat"><span class="stat-num">CC8</span><span class="stat-label">SOC 2 Mapping</span></div>
+        <div class="framework-coverage">
+          <span class="fw-chip fw-soc2">SOC 2</span>
+          <span class="fw-chip fw-iso">ISO 27001</span>
+          <span class="fw-chip fw-cmmc2">CMMC</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="controls-table-wrap">
+        <table class="controls-table">
+          <thead>
+            <tr>
+              <th>Control ID</th>
+              <th class="td-name">Control Name</th>
+              <th class="td-impl">Description</th>
+              <th>SOC 2</th>
+              <th>ISO 27001</th>
+              <th>CMMC</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="ctrl-id">CM-01</span></td>
+              <td class="td-name">Segregation of Environments</td>
+              <td class="ctrl-impl">Development, staging, and production environments are segregated.</td>
+              <td>CC8.1</td>
+              <td>8.31</td>
+              <td>CM.2.062</td>
+              <td><span class="status status-implemented">✅ Implemented</span></td>
+            </tr>
+            <tr>
+              <td><span class="ctrl-id">CM-02</span></td>
+              <td class="td-name">Secure Development Policy</td>
+              <td class="ctrl-impl">A Secure Development Policy defines requirements for secure software development.</td>
+              <td>CC8.1</td>
+              <td>8.25</td>
+              <td>SA.3.169</td>
+              <td><span class="status status-implemented">✅ Implemented</span></td>
+            </tr>
+            <tr>
+              <td><span class="ctrl-id">CM-03</span></td>
+              <td class="td-name">Production Data Use Restricted</td>
+              <td class="ctrl-impl">Production data is not used in dev/test environments unless required for debugging.</td>
+              <td>C1.1</td>
+              <td>8.33</td>
+              <td>CM.2.062</td>
+              <td><span class="status status-implemented">✅ Implemented</span></td>
+            </tr>
+            <tr>
+              <td><span class="ctrl-id">CM-04</span></td>
+              <td class="td-name">Software Change Testing</td>
+              <td class="ctrl-impl">Software changes are tested prior to deployment into production.</td>
+              <td>CC8.1</td>
+              <td>8.29</td>
+              <td>CM.2.062</td>
+              <td><span class="status status-implemented">✅ Implemented</span></td>
+            </tr>
+            <tr>
+              <td><span class="ctrl-id">CM-05</span></td>
+              <td class="td-name">Baseline Configurations</td>
+              <td class="ctrl-impl">Baseline configurations for production infrastructure are securely managed.</td>
+              <td>CC8.1</td>
+              <td>8.9</td>
+              <td>CM.2.061</td>
+              <td><span class="status status-implemented">✅ Implemented</span></td>
+            </tr>
+            <tr>
+              <td><span class="ctrl-id">CM-06</span></td>
+              <td class="td-name">Configuration & Asset Management Policy</td>
+              <td class="ctrl-impl">Policy governs configurations for new sensitive systems.</td>
+              <td>CC8.1</td>
+              <td>5.9</td>
+              <td>CM.2.064</td>
+              <td><span class="status status-implemented">✅ Implemented</span></td>
+            </tr>
+            <tr>
+              <td><span class="ctrl-id">CM-07</span></td>
+              <td class="td-name">Approval for System Changes</td>
+              <td class="ctrl-impl">System changes are approved by at least 1 independent person prior to deployment.</td>
+              <td>CC8.1</td>
+              <td>8.32</td>
+              <td>CM.2.062</td>
+              <td><span class="status status-implemented">✅ Implemented</span></td>
+            </tr>
+            <tr>
+              <td><span class="ctrl-id">CM-08</span></td>
+              <td class="td-name">Change Management Policy</td>
+              <td class="ctrl-impl">Policy governs documenting, tracking, testing, and approving system changes.</td>
+              <td>CC8.1</td>
+              <td>5.37</td>
+              <td>CM.2.064</td>
+              <td><span class="status status-implemented">✅ Implemented</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; 2024 [Company Name]. All rights reserved.</p>
+      <nav>
+        <a href="../index.html">Trust Center</a>
+        <a href="../security.html">Security</a>
+        <a href="../subprocessors.html">Subprocessors</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>
