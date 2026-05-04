@@ -1071,633 +1071,8 @@
   </footer>
 
   
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-        // === EDGE FUNCTION INTEGRATION ===
-        const SUPABASE_EDGE_FUNCTION_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co/functions/v1/request-documents';
-
-        async function handleFormSubmit(event) {
-            event.preventDefault();
-            
-            const form = event.target;
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            
-            // Validate NDA acceptance
-            const ndaCheckbox = document.getElementById('nda-checkbox');
-            if (!ndaCheckbox.checked) {
-                alert('Please accept the Non-Disclosure Agreement to continue.');
-                return;
-            }
-            
-            // Get selected documents
-            const selectedDocs = [];
-            document.querySelectorAll('input[name="documents"]:checked').forEach(cb => {
-                selectedDocs.push(cb.value);
-            });
-            
-            if (selectedDocs.length === 0) {
-                alert('Please select at least one document to request.');
-                return;
-            }
-            
-            // Show loading state
-            submitBtn.innerHTML = '⏳ Processing...';
-            submitBtn.disabled = true;
-            
-            try {
-                const response = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        fullName: document.getElementById('full-name').value,
-                        email: document.getElementById('email').value,
-                        companyName: document.getElementById('company-name').value,
-                        documents: selectedDocs,
-                        ndaAccepted: true
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok && result.success) {
-                    // Hide form, show success
-                    document.getElementById('request-form').style.display = 'none';
-                    showDocumentDownloads(result.documents, result.expiresAt, result.emailSent);
-                } else {
-                    throw new Error(result.error || 'Request failed');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error submitting request: ' + error.message);
-            } finally {
-                submitBtn.innerHTML = originalBtnText;
-                submitBtn.disabled = false;
-            }
-        }
-
-        function showDocumentDownloads(documents, expiresAt, emailSent) {
-            const successDiv = document.getElementById('request-success');
-            const expiryDate = new Date(expiresAt).toLocaleDateString('en-US', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            });
-            
-            let emailMessage = '';
-            if (emailSent) {
-                emailMessage = '<div style="background: #dcfce7; border-left: 4px solid #22c55e; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px;"><p style="margin: 0; color: #166534;">📧 <strong>Email Sent!</strong> We\'ve also sent these links to your email address.</p></div>';
-            }
-            
-            let cardsHtml = documents.map(doc => `
-                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 style="margin: 0; font-size: 16px;">${doc.icon} ${doc.name}</h4>
-                        <a href="${doc.url}" target="_blank" style="background: #2563eb; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500;">
-                            ⬇️ Download PDF
-                        </a>
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">Copy URL:</label>
-                        <input type="text" value="${doc.url}" readonly onclick="this.select(); navigator.clipboard.writeText(this.value); this.style.borderColor='#22c55e';" 
-                               style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; background: #f9fafb; cursor: pointer; box-sizing: border-box;" />
-                    </div>
-                </div>
-            `).join('');
-            
-            successDiv.innerHTML = `
-                <div style="text-align: center; margin-bottom: 24px;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
-                    <h3 style="margin: 0 0 8px 0; color: #1f2937;">Request Approved!</h3>
-                    <p style="color: #6b7280; margin: 0;">Your documents are ready for download.</p>
-                </div>
-                ${emailMessage}
-                <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #92400e;">⏰ <strong>Note:</strong> These links expire on ${expiryDate}</p>
-                </div>
-                ${cardsHtml}
-            `;
-            successDiv.style.display = 'block';
-        }
-
-        // Attach form handler on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('request-form');
-            if (form) {
-                form.addEventListener('submit', handleFormSubmit);
-            }
-        });
-
-    </script>
-  <script>
-    // Supabase configuration - Update these with your actual values
-    const SUPABASE_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_xtPucbBGqU9hC0aYKtGESw_9zLbY0Eq';
-    const STORAGE_BUCKET = 'audit-docs'; // Supabase Storage bucket name
-    
-    // Initialize Supabase client
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
-    // Document metadata - file paths are relative to Supabase Storage bucket
-    const documentData = {
-      soc2: {
-        name: 'SOC 2 Type II Report',
-        icon: '🔒',
-        description: '2024 Annual Audit Report',
-        storagePath: 'soc2.pdf',
-        fileName: 'SOC2-Type2-Report-2024.pdf'
-      },
-      iso27001: {
-        name: 'ISO 27001 Certificate',
-        icon: '📋',
-        description: 'Valid through Dec 2025',
-        storagePath: 'iso27001.pdf',
-        fileName: 'ISO27001-Certificate.pdf'
-      },
-      pentest: {
-        name: 'Penetration Test Summary',
-        icon: '🔍',
-        description: 'Q4 2024 Assessment',
-        storagePath: 'pentest.pdf',
-        fileName: 'Penetration-Test-Summary-Q4-2024.pdf'
-      },
-      cmmc: {
-        name: 'CMMC Assessment',
-        icon: '🛡️',
-        description: 'Level 2 Self-Assessment',
-        storagePath: 'cmmc.pdf',
-        fileName: 'CMMC-Level2-Assessment.pdf'
-      },
-      dpa: {
-        name: 'Data Processing Agreement',
-        icon: '📜',
-        description: 'Standard DPA Template',
-        storagePath: 'dpa.pdf',
-        fileName: 'Data-Processing-Agreement.pdf'
-      },
-      vsaq: {
-        name: 'Security Questionnaire',
-        icon: '📝',
-        description: 'Pre-filled SIG Lite',
-        storagePath: 'questionnaire.pdf',
-        fileName: 'Vendor-Security-Questionnaire.pdf'
-      }
-    };
-    
-    // Store request ID for download tracking
-    let currentRequestId = null;
-    
-    // Form submission handler
-    document.getElementById('document-request-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const submitBtn = e.target.querySelector('.btn-submit');
-      const btnText = submitBtn.querySelector('.btn-text');
-      const btnLoading = submitBtn.querySelector('.btn-loading');
-      
-      // Get form values
-      const fullName = document.getElementById('fullName').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const companyName = document.getElementById('companyName').value.trim();
-      const acceptNDA = document.getElementById('acceptNDA').checked;
-      
-      // Get selected documents
-      const documentCheckboxes = document.querySelectorAll('input[name="documents"]:checked');
-      const selectedDocuments = Array.from(documentCheckboxes).map(cb => cb.value);
-      
-      if (selectedDocuments.length === 0) {
-        alert('Please select at least one document to request.');
-        return;
-      }
-      
-      if (!acceptNDA) {
-        alert('Please accept the Non-Disclosure Agreement to proceed.');
-        return;
-      }
-      
-      // Show loading state
-      btnText.style.display = 'none';
-      btnLoading.style.display = 'inline';
-      submitBtn.disabled = true;
-      
-      try {
-        // Submit to Supabase
-        const { data, error } = await supabase
-          .from('document_requests')
-          .insert([
-            {
-              full_name: fullName,
-              email: email,
-              company_name: companyName,
-              nda_accepted: acceptNDA,
-              nda_accepted_at: new Date().toISOString(),
-              documents_requested: selectedDocuments,
-              user_agent: navigator.userAgent
-            }
-          ])
-          .select();
-        
-        if (error) throw error;
-        
-        // Store request ID for download tracking
-        currentRequestId = data[0].id;
-        
-        // Show success and download links
-        await showDownloadSection(email, selectedDocuments);
-        
-        console.log('Request submitted:', data);
-        
-      } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('There was an error submitting your request. Please try again or contact security@company.com');
-      } finally {
-        // Reset button state
-        btnText.style.display = 'inline';
-        btnLoading.style.display = 'none';
-        submitBtn.disabled = false;
-      }
-    });
-    
-    // Generate signed URL for secure document download from Supabase Storage
-    async function getSignedUrl(storagePath, expiresIn = 604800) {
-      try {
-        const { data, error } = await supabase
-          .storage
-          .from(STORAGE_BUCKET)
-          .createSignedUrl(storagePath, expiresIn);
-        
-        if (error) throw error;
-        return data.signedUrl;
-      } catch (error) {
-        console.error('Error generating signed URL:', error);
-        return null;
-      }
-    }
-    
-    // Show download section after successful submission
-    async function showDownloadSection(email, selectedDocuments) {
-      document.getElementById('request-form-container').style.display = 'none';
-      document.getElementById('download-container').style.display = 'block';
-      document.getElementById('confirmed-email').textContent = email;
-      
-      // Build download cards
-      const downloadGrid = document.getElementById('download-grid');
-      downloadGrid.innerHTML = '<div class="loading-docs">⏳ Preparing your documents...</div>';
-      
-      // Generate signed URLs for each selected document
-      const downloadCards = [];
-      
-      for (const docKey of selectedDocuments) {
-        const doc = documentData[docKey];
-        if (doc) {
-          // Get signed URL from Supabase Storage (valid for 1 hour)
-          const signedUrl = await getSignedUrl(doc.storagePath, 604800);
-          
-          const card = document.createElement('div');
-          card.className = 'download-card';
-          
-          if (signedUrl) {
-            card.innerHTML = `
-              <span class="doc-icon">${doc.icon}</span>
-              <h4>${doc.name}</h4>
-              <p>${doc.description}</p>
-              <a href="${signedUrl}" download="${doc.fileName}" class="btn-download" onclick="trackDownload('${docKey}', '${doc.storagePath}')">
-                ⬇️ Download PDF
-              </a>
-              <div class="url-display" style="margin-top: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px;">
-                <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px;">📋 Document URL (valid for 7 days) - Click to copy:</label>
-                <input type="text" value="${signedUrl}" readonly 
-                  style="width: 100%; padding: 8px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; background: white; color: #334155; cursor: pointer; font-family: monospace;"
-                  onclick="this.select(); navigator.clipboard.writeText(this.value).then(() => { this.style.borderColor='#22c55e'; this.style.backgroundColor='#f0fdf4'; setTimeout(() => { this.style.borderColor='#cbd5e1'; this.style.backgroundColor='white'; }, 1500); });">
-              </div>
-              <span class="url-expiry">✅ Link valid for 7 days</span>
-            `;
-          } else {
-            card.innerHTML = `
-              <span class="doc-icon">${doc.icon}</span>
-              <h4>${doc.name}</h4>
-              <p>${doc.description}</p>
-              <button class="btn-download btn-disabled" disabled>
-                ⚠️ Unavailable
-              </button>
-              <span class="url-error">Document not found. Please contact support.</span>
-            `;
-          }
-          downloadCards.push(card);
-        }
-      }
-      
-      // Clear loading and add cards
-      downloadGrid.innerHTML = '';
-      downloadCards.forEach(card => downloadGrid.appendChild(card));
-    }
-    
-    // Track document downloads in Supabase
-    async function trackDownload(docKey, storagePath, signedUrl) {
-      try {
-        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-        await supabase
-          .from('document_downloads')
-          .insert([
-            {
-              request_id: currentRequestId,
-              document_type: docKey,
-              storage_path: storagePath,
-              signed_url: signedUrl,
-              expires_at: expiresAt,
-              downloaded_at: new Date().toISOString()
-            }
-          ]);
-      } catch (error) {
-        console.error('Error tracking download:', error);
-      }
-    }
-    
-    // Refresh signed URL if needed (for long sessions)
-    async function refreshDownloadUrl(docKey) {
-      const doc = documentData[docKey];
-      if (!doc) return;
-      
-      const signedUrl = await getSignedUrl(doc.storagePath, 604800);
-      if (signedUrl) {
-        // Find and update the download link
-        const downloadLinks = document.querySelectorAll('.btn-download');
-        downloadLinks.forEach(link => {
-          if (link.getAttribute('onclick')?.includes(docKey)) {
-            link.href = signedUrl;
-          }
-        });
-        alert('Download link refreshed! You have 1 hour to download.');
-      } else {
-        alert('Unable to refresh download link. Please try again.');
-      }
-    }
-    
-    // Reset form to allow new requests
-    function resetForm() {
-      document.getElementById('request-form-container').style.display = 'block';
-      document.getElementById('download-container').style.display = 'none';
-      document.getElementById('document-request-form').reset();
-      currentRequestId = null;
-    }
-    
-    // NDA Modal functions
-    function showNDAModal() {
-      document.getElementById('nda-modal').style.display = 'flex';
-    }
-    
-    function closeNDAModal() {
-      document.getElementById('nda-modal').style.display = 'none';
-    }
-    
-    function acceptNDA() {
-      document.getElementById('acceptNDA').checked = true;
-      closeNDAModal();
-    }
-    
-    // Close modal on outside click
-    document.getElementById('nda-modal').addEventListener('click', (e) => {
-      if (e.target === document.getElementById('nda-modal')) {
-        closeNDAModal();
-      }
-    });
   
-        // === EDGE FUNCTION INTEGRATION ===
-        const SUPABASE_EDGE_FUNCTION_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co/functions/v1/request-documents';
-
-        async function handleFormSubmit(event) {
-            event.preventDefault();
-            
-            const form = event.target;
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            
-            // Validate NDA acceptance
-            const ndaCheckbox = document.getElementById('nda-checkbox');
-            if (!ndaCheckbox.checked) {
-                alert('Please accept the Non-Disclosure Agreement to continue.');
-                return;
-            }
-            
-            // Get selected documents
-            const selectedDocs = [];
-            document.querySelectorAll('input[name="documents"]:checked').forEach(cb => {
-                selectedDocs.push(cb.value);
-            });
-            
-            if (selectedDocs.length === 0) {
-                alert('Please select at least one document to request.');
-                return;
-            }
-            
-            // Show loading state
-            submitBtn.innerHTML = '⏳ Processing...';
-            submitBtn.disabled = true;
-            
-            try {
-                const response = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        fullName: document.getElementById('full-name').value,
-                        email: document.getElementById('email').value,
-                        companyName: document.getElementById('company-name').value,
-                        documents: selectedDocs,
-                        ndaAccepted: true
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok && result.success) {
-                    // Hide form, show success
-                    document.getElementById('request-form').style.display = 'none';
-                    showDocumentDownloads(result.documents, result.expiresAt, result.emailSent);
-                } else {
-                    throw new Error(result.error || 'Request failed');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error submitting request: ' + error.message);
-            } finally {
-                submitBtn.innerHTML = originalBtnText;
-                submitBtn.disabled = false;
-            }
-        }
-
-        function showDocumentDownloads(documents, expiresAt, emailSent) {
-            const successDiv = document.getElementById('request-success');
-            const expiryDate = new Date(expiresAt).toLocaleDateString('en-US', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            });
-            
-            let emailMessage = '';
-            if (emailSent) {
-                emailMessage = '<div style="background: #dcfce7; border-left: 4px solid #22c55e; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px;"><p style="margin: 0; color: #166534;">📧 <strong>Email Sent!</strong> We\'ve also sent these links to your email address.</p></div>';
-            }
-            
-            let cardsHtml = documents.map(doc => `
-                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 style="margin: 0; font-size: 16px;">${doc.icon} ${doc.name}</h4>
-                        <a href="${doc.url}" target="_blank" style="background: #2563eb; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500;">
-                            ⬇️ Download PDF
-                        </a>
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">Copy URL:</label>
-                        <input type="text" value="${doc.url}" readonly onclick="this.select(); navigator.clipboard.writeText(this.value); this.style.borderColor='#22c55e';" 
-                               style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; background: #f9fafb; cursor: pointer; box-sizing: border-box;" />
-                    </div>
-                </div>
-            `).join('');
-            
-            successDiv.innerHTML = `
-                <div style="text-align: center; margin-bottom: 24px;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
-                    <h3 style="margin: 0 0 8px 0; color: #1f2937;">Request Approved!</h3>
-                    <p style="color: #6b7280; margin: 0;">Your documents are ready for download.</p>
-                </div>
-                ${emailMessage}
-                <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #92400e;">⏰ <strong>Note:</strong> These links expire on ${expiryDate}</p>
-                </div>
-                ${cardsHtml}
-            `;
-            successDiv.style.display = 'block';
-        }
-
-        // Attach form handler on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('request-form');
-            if (form) {
-                form.addEventListener('submit', handleFormSubmit);
-            }
-        });
-
-    </script>
-  <script src="js/site.js">
-        // === EDGE FUNCTION INTEGRATION ===
-        const SUPABASE_EDGE_FUNCTION_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co/functions/v1/request-documents';
-
-        async function handleFormSubmit(event) {
-            event.preventDefault();
-            
-            const form = event.target;
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
-            
-            // Validate NDA acceptance
-            const ndaCheckbox = document.getElementById('nda-checkbox');
-            if (!ndaCheckbox.checked) {
-                alert('Please accept the Non-Disclosure Agreement to continue.');
-                return;
-            }
-            
-            // Get selected documents
-            const selectedDocs = [];
-            document.querySelectorAll('input[name="documents"]:checked').forEach(cb => {
-                selectedDocs.push(cb.value);
-            });
-            
-            if (selectedDocs.length === 0) {
-                alert('Please select at least one document to request.');
-                return;
-            }
-            
-            // Show loading state
-            submitBtn.innerHTML = '⏳ Processing...';
-            submitBtn.disabled = true;
-            
-            try {
-                const response = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        fullName: document.getElementById('full-name').value,
-                        email: document.getElementById('email').value,
-                        companyName: document.getElementById('company-name').value,
-                        documents: selectedDocs,
-                        ndaAccepted: true
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok && result.success) {
-                    // Hide form, show success
-                    document.getElementById('request-form').style.display = 'none';
-                    showDocumentDownloads(result.documents, result.expiresAt, result.emailSent);
-                } else {
-                    throw new Error(result.error || 'Request failed');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error submitting request: ' + error.message);
-            } finally {
-                submitBtn.innerHTML = originalBtnText;
-                submitBtn.disabled = false;
-            }
-        }
-
-        function showDocumentDownloads(documents, expiresAt, emailSent) {
-            const successDiv = document.getElementById('request-success');
-            const expiryDate = new Date(expiresAt).toLocaleDateString('en-US', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            });
-            
-            let emailMessage = '';
-            if (emailSent) {
-                emailMessage = '<div style="background: #dcfce7; border-left: 4px solid #22c55e; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px;"><p style="margin: 0; color: #166534;">📧 <strong>Email Sent!</strong> We\'ve also sent these links to your email address.</p></div>';
-            }
-            
-            let cardsHtml = documents.map(doc => `
-                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 style="margin: 0; font-size: 16px;">${doc.icon} ${doc.name}</h4>
-                        <a href="${doc.url}" target="_blank" style="background: #2563eb; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 500;">
-                            ⬇️ Download PDF
-                        </a>
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">Copy URL:</label>
-                        <input type="text" value="${doc.url}" readonly onclick="this.select(); navigator.clipboard.writeText(this.value); this.style.borderColor='#22c55e';" 
-                               style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; background: #f9fafb; cursor: pointer; box-sizing: border-box;" />
-                    </div>
-                </div>
-            `).join('');
-            
-            successDiv.innerHTML = `
-                <div style="text-align: center; margin-bottom: 24px;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
-                    <h3 style="margin: 0 0 8px 0; color: #1f2937;">Request Approved!</h3>
-                    <p style="color: #6b7280; margin: 0;">Your documents are ready for download.</p>
-                </div>
-                ${emailMessage}
-                <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
-                    <p style="margin: 0; color: #92400e;">⏰ <strong>Note:</strong> These links expire on ${expiryDate}</p>
-                </div>
-                ${cardsHtml}
-            `;
-            successDiv.style.display = 'block';
-        }
-
-        // Attach form handler on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('request-form');
-            if (form) {
-                form.addEventListener('submit', handleFormSubmit);
-            }
-        });
-
-    </script>
-
-    
-
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // === TRUST CENTER DOCUMENT REQUEST FORM ===
         const SUPABASE_EDGE_FUNCTION_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co/functions/v1/request-documents';
@@ -1708,8 +1083,10 @@
             if (!statusDiv) {
                 statusDiv = document.createElement('div');
                 statusDiv.id = 'form-status';
-                const form = document.getElementById('request-form');
-                form.parentNode.insertBefore(statusDiv, form);
+                const form = document.getElementById('document-request-form') || document.querySelector('form');
+                if (form) {
+                    form.parentNode.insertBefore(statusDiv, form);
+                }
             }
             
             const colors = {
@@ -1735,18 +1112,95 @@
             if (statusDiv) statusDiv.style.display = 'none';
         }
 
+        // Show success page with download links
+        function showSuccessPage(result) {
+            // Hide form
+            const formContainer = document.querySelector('.form-container') || document.getElementById('document-request-form')?.parentElement;
+            if (formContainer) {
+                formContainer.style.display = 'none';
+            }
+            
+            // Show or create success container
+            let successDiv = document.getElementById('request-success');
+            if (!successDiv) {
+                successDiv = document.createElement('div');
+                successDiv.id = 'request-success';
+                formContainer?.parentElement?.appendChild(successDiv);
+            }
+            
+            const expiresDate = new Date(result.expiresAt).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            let documentsHtml = result.documents.map(doc => `
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <span style="font-size: 32px;">${doc.icon}</span>
+                            <div>
+                                <h4 style="margin: 0; font-weight: 600; color: #111827;">${doc.name}</h4>
+                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #6b7280;">Click to download PDF</p>
+                            </div>
+                        </div>
+                        <a href="${doc.url}" target="_blank" 
+                           style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;">
+                            📥 Download PDF
+                        </a>
+                    </div>
+                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                        <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">Direct Link (valid for 7 days):</label>
+                        <input type="text" value="${doc.url}" readonly 
+                               onclick="this.select(); document.execCommand('copy'); this.style.borderColor='#22c55e';"
+                               style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; color: #374151; background: #f9fafb; cursor: pointer;"
+                               title="Click to copy">
+                    </div>
+                </div>
+            `).join('');
+            
+            successDiv.innerHTML = `
+                <div style="max-width: 800px; margin: 0 auto; padding: 40px 20px;">
+                    <div style="text-align: center; margin-bottom: 32px;">
+                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                            <span style="font-size: 40px;">✅</span>
+                        </div>
+                        <h2 style="margin: 0 0 8px 0; font-size: 28px; color: #111827;">Request Approved!</h2>
+                        <p style="margin: 0; color: #6b7280; font-size: 16px;">Your compliance documents are ready for download.</p>
+                    </div>
+                    
+                    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
+                        <p style="margin: 0; color: #92400e; font-size: 14px;">
+                            <strong>⏰ Important:</strong> These links expire on <strong>${expiresDate}</strong>. Please download your documents before then.
+                        </p>
+                    </div>
+                    
+                    <h3 style="margin: 0 0 16px 0; font-size: 18px; color: #374151;">📄 Your Documents</h3>
+                    ${documentsHtml}
+                    
+                    <div style="text-align: center; margin-top: 32px;">
+                        <button onclick="location.reload()" 
+                                style="background: #f3f4f6; color: #374151; padding: 12px 24px; border: 1px solid #d1d5db; border-radius: 8px; cursor: pointer; font-weight: 500;">
+                            ← Request Additional Documents
+                        </button>
+                    </div>
+                </div>
+            `;
+            successDiv.style.display = 'block';
+        }
+
+        // Main form submit handler
         async function handleFormSubmit(event) {
             event.preventDefault();
+            console.log('Form submitted!');
             
             const form = event.target;
             const submitBtn = form.querySelector('button[type="submit"]');
-            const originalBtnText = submitBtn.innerHTML;
+            const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
             
-            // Clear any previous status
-            hideStatus();
-            
-            // Validate NDA acceptance
-            const ndaCheckbox = document.getElementById('nda-checkbox');
+            // Get checkbox - try multiple possible IDs
+            const ndaCheckbox = document.getElementById('acceptNDA') || document.getElementById('nda-checkbox') || form.querySelector('input[type="checkbox"]');
             if (!ndaCheckbox || !ndaCheckbox.checked) {
                 showStatus('Please accept the Non-Disclosure Agreement to continue.', 'error');
                 return;
@@ -1754,7 +1208,7 @@
             
             // Get selected documents
             const selectedDocs = [];
-            document.querySelectorAll('input[name="documents"]:checked').forEach(cb => {
+            form.querySelectorAll('input[name="documents"]:checked').forEach(cb => {
                 selectedDocs.push(cb.value);
             });
             
@@ -1763,22 +1217,25 @@
                 return;
             }
             
-            // Get form values
-            const fullName = document.getElementById('full-name')?.value?.trim();
-            const email = document.getElementById('email')?.value?.trim();
-            const companyName = document.getElementById('company-name')?.value?.trim();
+            // Get form values - try multiple possible IDs
+            const fullName = (document.getElementById('full-name') || document.getElementById('fullName') || form.querySelector('input[name="fullName"]'))?.value || '';
+            const email = (document.getElementById('email') || form.querySelector('input[name="email"]'))?.value || '';
+            const companyName = (document.getElementById('company-name') || document.getElementById('companyName') || form.querySelector('input[name="companyName"]'))?.value || '';
             
             if (!fullName || !email || !companyName) {
-                showStatus('Please fill out all required fields.', 'error');
+                showStatus('Please fill in all required fields.', 'error');
                 return;
             }
             
             // Show loading state
             showStatus('Processing your request... Please wait.', 'loading');
-            submitBtn.innerHTML = '⏳ Processing...';
-            submitBtn.disabled = true;
+            if (submitBtn) {
+                submitBtn.innerHTML = '⏳ Processing...';
+                submitBtn.disabled = true;
+            }
             
             try {
+                console.log('Sending request to:', SUPABASE_EDGE_FUNCTION_URL);
                 const response = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
                     method: 'POST',
                     headers: {
@@ -1793,119 +1250,68 @@
                     })
                 });
                 
+                console.log('Response status:', response.status);
                 const result = await response.json();
+                console.log('Response:', result);
                 
                 if (result.success) {
-                    // Hide form and status, show success with documents
                     hideStatus();
-                    document.getElementById('request-form').style.display = 'none';
-                    showDocumentDownloads(result);
+                    showSuccessPage(result);
                 } else {
-                    showStatus(result.error || 'Request failed. Please try again.', 'error');
+                    showStatus(result.error || 'An error occurred. Please try again.', 'error');
+                    if (submitBtn) {
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = false;
+                    }
                 }
             } catch (error) {
                 console.error('Error:', error);
                 showStatus('Network error. Please check your connection and try again.', 'error');
-            } finally {
-                submitBtn.innerHTML = originalBtnText;
-                submitBtn.disabled = false;
+                if (submitBtn) {
+                    submitBtn.innerHTML = originalBtnText;
+                    submitBtn.disabled = false;
+                }
             }
         }
 
-        function showDocumentDownloads(result) {
-            const successDiv = document.getElementById('request-success') || document.createElement('div');
-            successDiv.id = 'request-success';
-            
-            const form = document.getElementById('request-form');
-            if (!document.getElementById('request-success')) {
-                form.parentNode.insertBefore(successDiv, form.nextSibling);
+        // NDA Modal functions
+        function showNDAModal() {
+            let modal = document.getElementById('nda-modal');
+            if (modal) {
+                modal.style.display = 'flex';
             }
-            
-            const expiryDate = new Date(result.expiresAt).toLocaleDateString('en-US', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            });
-            
-            // Email status message
-            let emailMessage = '';
-            if (result.emailSent) {
-                emailMessage = `
-                    <div style="background: #dcfce7; border-left: 4px solid #22c55e; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
-                        <p style="margin: 0; color: #166534; font-size: 14px;">
-                            📧 <strong>Email Sent!</strong> We've also sent these download links to your email address.
-                        </p>
-                    </div>
-                `;
-            } else if (result.emailError) {
-                emailMessage = `
-                    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
-                        <p style="margin: 0; color: #92400e; font-size: 14px;">
-                            ⚠️ <strong>Note:</strong> Email could not be sent, but you can download your documents below.
-                        </p>
-                    </div>
-                `;
-            }
-            
-            // Build document cards
-            let cardsHtml = result.documents.map(doc => `
-                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-                        <h4 style="margin: 0; font-size: 16px; color: #1f2937;">
-                            <span style="font-size: 20px;">${doc.icon}</span> ${doc.name}
-                        </h4>
-                        <a href="${doc.url}" target="_blank" rel="noopener noreferrer" 
-                           style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);">
-                            ⬇️ Download PDF
-                        </a>
-                    </div>
-                    <div style="margin-top: 14px;">
-                        <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 6px;">📋 Copy URL (valid for 7 days):</label>
-                        <input type="text" value="${doc.url}" readonly 
-                               onclick="this.select(); navigator.clipboard.writeText(this.value).then(() => { this.style.borderColor='#22c55e'; this.style.backgroundColor='#f0fdf4'; setTimeout(() => { this.style.borderColor='#d1d5db'; this.style.backgroundColor='#f9fafb'; }, 1500); });"
-                               style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; background: #f9fafb; cursor: pointer; box-sizing: border-box; transition: all 0.2s;" />
-                    </div>
-                </div>
-            `).join('');
-            
-            successDiv.innerHTML = `
-                <div style="background: linear-gradient(to bottom, #f0fdf4, #ffffff); border: 1px solid #bbf7d0; border-radius: 16px; padding: 32px; margin-top: 20px;">
-                    <!-- Success Header -->
-                    <div style="text-align: center; margin-bottom: 28px;">
-                        <div style="width: 72px; height: 72px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);">
-                            <span style="font-size: 36px;">✓</span>
-                        </div>
-                        <h3 style="margin: 0 0 8px 0; color: #166534; font-size: 24px; font-weight: 700;">Request Approved!</h3>
-                        <p style="color: #4b5563; margin: 0; font-size: 15px;">Your compliance documents are ready for download.</p>
-                    </div>
-                    
-                    ${emailMessage}
-                    
-                    <!-- Expiry Notice -->
-                    <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
-                        <p style="margin: 0; color: #92400e; font-size: 14px;">
-                            ⏰ <strong>Important:</strong> These download links expire on <strong>${expiryDate}</strong>
-                        </p>
-                    </div>
-                    
-                    <!-- Document Cards -->
-                    <h4 style="margin: 0 0 16px 0; color: #374151; font-size: 16px; font-weight: 600;">📄 Your Documents</h4>
-                    ${cardsHtml}
-                    
-                    <!-- Request Another -->
-                    <div style="text-align: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                        <button onclick="location.reload()" style="background: #f3f4f6; color: #374151; padding: 12px 24px; border-radius: 8px; border: 1px solid #d1d5db; font-weight: 500; cursor: pointer; font-size: 14px;">
-                            🔄 Request Additional Documents
-                        </button>
-                    </div>
-                </div>
-            `;
-            successDiv.style.display = 'block';
         }
 
-        // Attach form handler on DOM load
+        function closeNDAModal() {
+            let modal = document.getElementById('nda-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function acceptNDA() {
+            const checkbox = document.getElementById('acceptNDA') || document.getElementById('nda-checkbox');
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+            closeNDAModal();
+        }
+
+        // Attach form handler on DOM ready
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('request-form');
+            console.log('DOM loaded, attaching form handler...');
+            
+            // Try multiple form selectors
+            const form = document.getElementById('document-request-form') || 
+                         document.getElementById('request-form') || 
+                         document.querySelector('form');
+            
             if (form) {
+                console.log('Form found:', form.id || 'no id');
                 form.addEventListener('submit', handleFormSubmit);
+                console.log('Form handler attached successfully');
+            } else {
+                console.error('No form found on page!');
             }
         });
     </script>
