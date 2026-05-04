@@ -1694,5 +1694,218 @@
         });
 
     </script>
+
+    <script>
+        // === TRUST CENTER DOCUMENT REQUEST FORM ===
+        const SUPABASE_EDGE_FUNCTION_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co/functions/v1/request-documents';
+
+        // Status message helper
+        function showStatus(message, type = 'info') {
+            let statusDiv = document.getElementById('form-status');
+            if (!statusDiv) {
+                statusDiv = document.createElement('div');
+                statusDiv.id = 'form-status';
+                const form = document.getElementById('request-form');
+                form.parentNode.insertBefore(statusDiv, form);
+            }
+            
+            const colors = {
+                'info': { bg: '#dbeafe', border: '#3b82f6', text: '#1e40af', icon: 'ℹ️' },
+                'loading': { bg: '#fef3c7', border: '#f59e0b', text: '#92400e', icon: '⏳' },
+                'success': { bg: '#dcfce7', border: '#22c55e', text: '#166534', icon: '✅' },
+                'error': { bg: '#fee2e2', border: '#ef4444', text: '#991b1b', icon: '❌' }
+            };
+            const c = colors[type] || colors.info;
+            
+            statusDiv.innerHTML = `
+                <div style="background: ${c.bg}; border-left: 4px solid ${c.border}; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+                    <p style="margin: 0; color: ${c.text}; font-size: 15px;">
+                        <span style="font-size: 18px;">${c.icon}</span> ${message}
+                    </p>
+                </div>
+            `;
+            statusDiv.style.display = 'block';
+        }
+
+        function hideStatus() {
+            const statusDiv = document.getElementById('form-status');
+            if (statusDiv) statusDiv.style.display = 'none';
+        }
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+            
+            // Clear any previous status
+            hideStatus();
+            
+            // Validate NDA acceptance
+            const ndaCheckbox = document.getElementById('nda-checkbox');
+            if (!ndaCheckbox || !ndaCheckbox.checked) {
+                showStatus('Please accept the Non-Disclosure Agreement to continue.', 'error');
+                return;
+            }
+            
+            // Get selected documents
+            const selectedDocs = [];
+            document.querySelectorAll('input[name="documents"]:checked').forEach(cb => {
+                selectedDocs.push(cb.value);
+            });
+            
+            if (selectedDocs.length === 0) {
+                showStatus('Please select at least one document to request.', 'error');
+                return;
+            }
+            
+            // Get form values
+            const fullName = document.getElementById('full-name')?.value?.trim();
+            const email = document.getElementById('email')?.value?.trim();
+            const companyName = document.getElementById('company-name')?.value?.trim();
+            
+            if (!fullName || !email || !companyName) {
+                showStatus('Please fill out all required fields.', 'error');
+                return;
+            }
+            
+            // Show loading state
+            showStatus('Processing your request... Please wait.', 'loading');
+            submitBtn.innerHTML = '⏳ Processing...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fullName: fullName,
+                        email: email,
+                        companyName: companyName,
+                        documents: selectedDocs,
+                        ndaAccepted: true
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Hide form and status, show success with documents
+                    hideStatus();
+                    document.getElementById('request-form').style.display = 'none';
+                    showDocumentDownloads(result);
+                } else {
+                    showStatus(result.error || 'Request failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('Network error. Please check your connection and try again.', 'error');
+            } finally {
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        function showDocumentDownloads(result) {
+            const successDiv = document.getElementById('request-success') || document.createElement('div');
+            successDiv.id = 'request-success';
+            
+            const form = document.getElementById('request-form');
+            if (!document.getElementById('request-success')) {
+                form.parentNode.insertBefore(successDiv, form.nextSibling);
+            }
+            
+            const expiryDate = new Date(result.expiresAt).toLocaleDateString('en-US', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+            
+            // Email status message
+            let emailMessage = '';
+            if (result.emailSent) {
+                emailMessage = `
+                    <div style="background: #dcfce7; border-left: 4px solid #22c55e; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+                        <p style="margin: 0; color: #166534; font-size: 14px;">
+                            📧 <strong>Email Sent!</strong> We've also sent these download links to your email address.
+                        </p>
+                    </div>
+                `;
+            } else if (result.emailError) {
+                emailMessage = `
+                    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+                        <p style="margin: 0; color: #92400e; font-size: 14px;">
+                            ⚠️ <strong>Note:</strong> Email could not be sent, but you can download your documents below.
+                        </p>
+                    </div>
+                `;
+            }
+            
+            // Build document cards
+            let cardsHtml = result.documents.map(doc => `
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <h4 style="margin: 0; font-size: 16px; color: #1f2937;">
+                            <span style="font-size: 20px;">${doc.icon}</span> ${doc.name}
+                        </h4>
+                        <a href="${doc.url}" target="_blank" rel="noopener noreferrer" 
+                           style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);">
+                            ⬇️ Download PDF
+                        </a>
+                    </div>
+                    <div style="margin-top: 14px;">
+                        <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 6px;">📋 Copy URL (valid for 7 days):</label>
+                        <input type="text" value="${doc.url}" readonly 
+                               onclick="this.select(); navigator.clipboard.writeText(this.value).then(() => { this.style.borderColor='#22c55e'; this.style.backgroundColor='#f0fdf4'; setTimeout(() => { this.style.borderColor='#d1d5db'; this.style.backgroundColor='#f9fafb'; }, 1500); });"
+                               style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; background: #f9fafb; cursor: pointer; box-sizing: border-box; transition: all 0.2s;" />
+                    </div>
+                </div>
+            `).join('');
+            
+            successDiv.innerHTML = `
+                <div style="background: linear-gradient(to bottom, #f0fdf4, #ffffff); border: 1px solid #bbf7d0; border-radius: 16px; padding: 32px; margin-top: 20px;">
+                    <!-- Success Header -->
+                    <div style="text-align: center; margin-bottom: 28px;">
+                        <div style="width: 72px; height: 72px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);">
+                            <span style="font-size: 36px;">✓</span>
+                        </div>
+                        <h3 style="margin: 0 0 8px 0; color: #166534; font-size: 24px; font-weight: 700;">Request Approved!</h3>
+                        <p style="color: #4b5563; margin: 0; font-size: 15px;">Your compliance documents are ready for download.</p>
+                    </div>
+                    
+                    ${emailMessage}
+                    
+                    <!-- Expiry Notice -->
+                    <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
+                        <p style="margin: 0; color: #92400e; font-size: 14px;">
+                            ⏰ <strong>Important:</strong> These download links expire on <strong>${expiryDate}</strong>
+                        </p>
+                    </div>
+                    
+                    <!-- Document Cards -->
+                    <h4 style="margin: 0 0 16px 0; color: #374151; font-size: 16px; font-weight: 600;">📄 Your Documents</h4>
+                    ${cardsHtml}
+                    
+                    <!-- Request Another -->
+                    <div style="text-align: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                        <button onclick="location.reload()" style="background: #f3f4f6; color: #374151; padding: 12px 24px; border-radius: 8px; border: 1px solid #d1d5db; font-weight: 500; cursor: pointer; font-size: 14px;">
+                            🔄 Request Additional Documents
+                        </button>
+                    </div>
+                </div>
+            `;
+            successDiv.style.display = 'block';
+        }
+
+        // Attach form handler on DOM load
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('request-form');
+            if (form) {
+                form.addEventListener('submit', handleFormSubmit);
+            }
+        });
+    </script>
+
 </body>
 </html>
