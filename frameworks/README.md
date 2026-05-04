@@ -12,6 +12,20 @@ This directory contains onboarding documentation, control mappings, assessment w
 | **CMMC Level 1** | DoD / CMMC AB | DoD suppliers handling FCI | [`cmmc/level-1-assessment.md`](cmmc/level-1-assessment.md) |
 | **CMMC Level 2** | DoD / CMMC AB | DoD suppliers handling CUI | [`cmmc/level-2-assessment.md`](cmmc/level-2-assessment.md) |
 
+## Trust Services Criteria Coverage
+
+The control matrix (`../controls/control-matrix.md`) covers all five TSC categories:
+
+| Category | Criteria | Scope |
+|---|---|---|
+| **Security (CC)** | CC1–CC9 | Always in scope |
+| **Availability (A)** | A1 | In scope for SLAs |
+| **Confidentiality (C)** | C1 | In scope for confidential data handling |
+| **Processing Integrity (PI)** | PI1 | In scope for transaction-processing systems |
+| **Privacy (P)** | P1–P8 | In scope for PII processing |
+
+---
+
 ## Cross-Framework Control Map
 
 [`cross-framework-map.md`](cross-framework-map.md) shows, for every major control domain, which specific requirements across **all five** frameworks are satisfied by the same underlying control. Use it to:
