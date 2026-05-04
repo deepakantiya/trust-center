@@ -4,22 +4,72 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
+  // Handle CORS preflight requests FIRST before any body parsing
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response(null, { 
+      status: 204,
+      headers: corsHeaders 
+    })
+  }
+
+  // Only accept POST requests
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ 
+      success: false,
+      error: 'Method not allowed. Use POST.' 
+    }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
   }
 
   try {
-    const { fullName, email, companyName, documents, ndaAccepted } = await req.json()
+    // Parse JSON body with error handling
+    let body
+    try {
+      const text = await req.text()
+      console.log('Received request body:', text.substring(0, 200))
+      
+      if (!text || text.trim() === '') {
+        return new Response(JSON.stringify({ 
+          success: false,
+          error: 'Request body is empty. Please send a JSON payload.' 
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
+      
+      body = JSON.parse(text)
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError)
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: 'Invalid JSON in request body. Please send valid JSON.' 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    const { fullName, email, companyName, documents, ndaAccepted } = body
 
     // Validation
     if (!fullName || !email || !companyName || !documents?.length || !ndaAccepted) {
+      const missing = []
+      if (!fullName) missing.push('fullName')
+      if (!email) missing.push('email')
+      if (!companyName) missing.push('companyName')
+      if (!documents?.length) missing.push('documents')
+      if (!ndaAccepted) missing.push('ndaAccepted')
+      
       return new Response(JSON.stringify({ 
         success: false,
-        error: 'Missing required fields. Please fill out all fields and select at least one document.' 
+        error: `Missing required fields: ${missing.join(', ')}` 
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -27,10 +77,21 @@ serve(async (req) => {
     }
 
     // Initialize Supabase client with service role key
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing Supabase environment variables')
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: 'Server configuration error. Please contact support.' 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+    
+    const supabase = createClient(supabaseUrl, supabaseKey)
 
     // Rate limiting: Check recent requests from this email (max 3 per hour)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
@@ -92,12 +153,20 @@ serve(async (req) => {
 
     for (const docKey of documents) {
       const doc = documentPaths[docKey]
-      if (!doc) continue
+      if (!doc) {
+        console.log(`Unknown document key: ${docKey}`)
+        continue
+      }
 
       const { data, error } = await supabase
         .storage
         .from('audit-docs')
         .createSignedUrl(doc.path, expiresIn)
+
+      if (error) {
+        console.error(`Error creating signed URL for ${docKey}:`, error)
+        continue
+      }
 
       if (data?.signedUrl) {
         // Store URL in database for tracking
@@ -116,6 +185,16 @@ serve(async (req) => {
           url: data.signedUrl
         })
       }
+    }
+
+    if (generatedUrls.length === 0) {
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: 'No documents could be generated. Please check if the requested documents exist.' 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
     }
 
     // Send email via Resend using test domain
@@ -152,6 +231,7 @@ serve(async (req) => {
         emailError = 'Email service unavailable'
       }
     } else {
+      console.log('RESEND_API_KEY not configured')
       emailError = 'Email service not configured'
     }
 
@@ -168,7 +248,7 @@ serve(async (req) => {
     })
 
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Unexpected error:', error)
     return new Response(JSON.stringify({ 
       success: false,
       error: 'An unexpected error occurred. Please try again.' 
@@ -206,69 +286,50 @@ function generateEmailHtml(
     day: 'numeric' 
   })
 
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; padding: 40px 20px; margin: 0;">
-      <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        
-        <!-- Header -->
-        <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 32px; text-align: center;">
-          <h1 style="color: white; margin: 0; font-size: 24px;">🔐 Trust Center</h1>
-          <p style="color: #bfdbfe; margin: 8px 0 0 0;">Compliance Documentation</p>
-        </div>
-        
-        <!-- Content -->
-        <div style="padding: 32px;">
-          <p style="font-size: 16px; color: #374151; margin: 0 0 16px 0;">
-            Hi ${name},
-          </p>
-          <p style="font-size: 16px; color: #374151; margin: 0 0 24px 0;">
-            Thank you for your interest in our security practices. As requested by <strong>${company}</strong>, here are your compliance documents:
-          </p>
-          
-          <!-- Documents Table -->
-          <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
-            <thead>
-              <tr style="background: #f9fafb;">
-                <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb;">Document</th>
-                <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb;">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${docRows}
-            </tbody>
-          </table>
-          
-          <!-- Expiry Notice -->
-          <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 0 8px 8px 0; margin: 24px 0;">
-            <p style="margin: 0; color: #92400e; font-size: 14px;">
-              ⏰ <strong>Important:</strong> These links will expire on <strong>${expiryDate}</strong>.
-            </p>
-          </div>
-          
-          <!-- NDA Reminder -->
-          <p style="font-size: 14px; color: #6b7280; margin: 24px 0 0 0;">
-            By downloading these documents, you acknowledge your acceptance of our Non-Disclosure Agreement. These materials are confidential and should not be shared with unauthorized parties.
-          </p>
-        </div>
-        
-        <!-- Footer -->
-        <div style="background: #f9fafb; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb;">
-          <p style="margin: 0; font-size: 14px; color: #6b7280;">
-            Questions? Contact us at <a href="mailto:security@example.com" style="color: #2563eb;">security@example.com</a>
-          </p>
-          <p style="margin: 12px 0 0 0; font-size: 12px; color: #9ca3af;">
-            © ${new Date().getFullYear()} Trust Center. All rights reserved.
-          </p>
-        </div>
-        
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f3f4f6; padding: 40px 20px; margin: 0;">
+  <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 32px; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 24px;">🔐 Trust Center</h1>
+      <p style="color: #bfdbfe; margin: 8px 0 0 0;">Compliance Documentation</p>
+    </div>
+    <div style="padding: 32px;">
+      <p style="font-size: 16px; color: #374151; margin: 0 0 16px 0;">Hi ${name},</p>
+      <p style="font-size: 16px; color: #374151; margin: 0 0 24px 0;">
+        Thank you for your interest in our security practices. As requested by <strong>${company}</strong>, here are your compliance documents:
+      </p>
+      <table style="width: 100%; border-collapse: collapse; margin: 24px 0;">
+        <thead>
+          <tr style="background: #f9fafb;">
+            <th style="padding: 12px; text-align: left; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb;">Document</th>
+            <th style="padding: 12px; text-align: right; font-weight: 600; color: #374151; border-bottom: 2px solid #e5e7eb;">Action</th>
+          </tr>
+        </thead>
+        <tbody>${docRows}</tbody>
+      </table>
+      <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; border-radius: 0 8px 8px 0; margin: 24px 0;">
+        <p style="margin: 0; color: #92400e; font-size: 14px;">
+          ⏰ <strong>Important:</strong> These links will expire on <strong>${expiryDate}</strong>.
+        </p>
       </div>
-    </body>
-    </html>
-  `
+      <p style="font-size: 14px; color: #6b7280; margin: 24px 0 0 0;">
+        By downloading these documents, you acknowledge your acceptance of our Non-Disclosure Agreement. These materials are confidential and should not be shared with unauthorized parties.
+      </p>
+    </div>
+    <div style="background: #f9fafb; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb;">
+      <p style="margin: 0; font-size: 14px; color: #6b7280;">
+        Questions? Contact us at <a href="mailto:security@example.com" style="color: #2563eb;">security@example.com</a>
+      </p>
+      <p style="margin: 12px 0 0 0; font-size: 12px; color: #9ca3af;">
+        © ${new Date().getFullYear()} Trust Center. All rights reserved.
+      </p>
+    </div>
+  </div>
+</body>
+</html>`
 }
