@@ -17,7 +17,10 @@ serve(async (req) => {
 
     // Validation
     if (!fullName || !email || !companyName || !documents?.length || !ndaAccepted) {
-      return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: 'Missing required fields. Please fill out all fields and select at least one document.' 
+      }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
@@ -39,7 +42,8 @@ serve(async (req) => {
 
     if (count && count >= 3) {
       return new Response(JSON.stringify({ 
-        error: 'Too many requests. Please try again later.' 
+        success: false,
+        error: 'Too many requests from this email. Please try again in an hour.' 
       }), {
         status: 429,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -62,7 +66,13 @@ serve(async (req) => {
 
     if (insertError) {
       console.error('Insert error:', insertError)
-      throw insertError
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: 'Failed to save your request. Please try again.' 
+      }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
     }
 
     // Document mapping
@@ -108,9 +118,10 @@ serve(async (req) => {
       }
     }
 
-    // Send email via Resend
+    // Send email via Resend using test domain
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
     let emailSent = false
+    let emailError = null
     
     if (resendApiKey) {
       const emailHtml = generateEmailHtml(fullName, companyName, generatedUrls, expiresAt)
@@ -123,7 +134,7 @@ serve(async (req) => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: 'Trust Center <security@yourdomain.com>',
+            from: 'Trust Center <onboarding@resend.dev>',
             to: [email],
             subject: '🔐 Your Requested Compliance Documents',
             html: emailHtml
@@ -133,24 +144,35 @@ serve(async (req) => {
         const emailResult = await emailResponse.json()
         console.log('Email response:', emailResult)
         emailSent = emailResponse.ok
-      } catch (emailError) {
-        console.error('Email error:', emailError)
+        if (!emailResponse.ok) {
+          emailError = emailResult.message || 'Email delivery failed'
+        }
+      } catch (err) {
+        console.error('Email error:', err)
+        emailError = 'Email service unavailable'
       }
+    } else {
+      emailError = 'Email service not configured'
     }
 
     return new Response(JSON.stringify({
       success: true,
+      message: 'Your request has been approved! Documents are ready for download.',
       requestId: requestRecord.id,
       documents: generatedUrls,
       expiresAt: expiresAt.toISOString(),
-      emailSent
+      emailSent,
+      emailError
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
 
   } catch (error) {
     console.error('Error:', error)
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+    return new Response(JSON.stringify({ 
+      success: false,
+      error: 'An unexpected error occurred. Please try again.' 
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
@@ -238,10 +260,10 @@ function generateEmailHtml(
         <!-- Footer -->
         <div style="background: #f9fafb; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb;">
           <p style="margin: 0; font-size: 14px; color: #6b7280;">
-            Questions? Contact us at <a href="mailto:security@yourdomain.com" style="color: #2563eb;">security@yourdomain.com</a>
+            Questions? Contact us at <a href="mailto:security@example.com" style="color: #2563eb;">security@example.com</a>
           </p>
           <p style="margin: 12px 0 0 0; font-size: 12px; color: #9ca3af;">
-            © ${new Date().getFullYear()} Your Company Name. All rights reserved.
+            © ${new Date().getFullYear()} Trust Center. All rights reserved.
           </p>
         </div>
         
