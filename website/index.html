@@ -1201,7 +1201,7 @@
     });
     
     // Generate signed URL for secure document download from Supabase Storage
-    async function getSignedUrl(storagePath, expiresIn = 3600) {
+    async function getSignedUrl(storagePath, expiresIn = 604800) {
       try {
         const { data, error } = await supabase
           .storage
@@ -1233,7 +1233,7 @@
         const doc = documentData[docKey];
         if (doc) {
           // Get signed URL from Supabase Storage (valid for 1 hour)
-          const signedUrl = await getSignedUrl(doc.storagePath, 3600);
+          const signedUrl = await getSignedUrl(doc.storagePath, 604800);
           
           const card = document.createElement('div');
           card.className = 'download-card';
@@ -1246,7 +1246,13 @@
               <a href="${signedUrl}" download="${doc.fileName}" class="btn-download" onclick="trackDownload('${docKey}', '${doc.storagePath}')">
                 ⬇️ Download PDF
               </a>
-              <span class="url-expiry">🕐 Link valid for 7 days</span>
+              <div class="url-display" style="margin-top: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px;">
+                <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 4px;">📋 Document URL (valid for 7 days) - Click to copy:</label>
+                <input type="text" value="${signedUrl}" readonly 
+                  style="width: 100%; padding: 8px; font-size: 11px; border: 1px solid #cbd5e1; border-radius: 4px; background: white; color: #334155; cursor: pointer; font-family: monospace;"
+                  onclick="this.select(); navigator.clipboard.writeText(this.value).then(() => { this.style.borderColor='#22c55e'; this.style.backgroundColor='#f0fdf4'; setTimeout(() => { this.style.borderColor='#cbd5e1'; this.style.backgroundColor='white'; }, 1500); });">
+              </div>
+              <span class="url-expiry">✅ Link valid for 7 days</span>
             `;
           } else {
             card.innerHTML = `
@@ -1269,8 +1275,9 @@
     }
     
     // Track document downloads in Supabase
-    async function trackDownload(docKey, storagePath) {
+    async function trackDownload(docKey, storagePath, signedUrl) {
       try {
+        const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
         await supabase
           .from('document_downloads')
           .insert([
@@ -1278,6 +1285,8 @@
               request_id: currentRequestId,
               document_type: docKey,
               storage_path: storagePath,
+              signed_url: signedUrl,
+              expires_at: expiresAt,
               downloaded_at: new Date().toISOString()
             }
           ]);
@@ -1291,7 +1300,7 @@
       const doc = documentData[docKey];
       if (!doc) return;
       
-      const signedUrl = await getSignedUrl(doc.storagePath, 3600);
+      const signedUrl = await getSignedUrl(doc.storagePath, 604800);
       if (signedUrl) {
         // Find and update the download link
         const downloadLinks = document.querySelectorAll('.btn-download');
