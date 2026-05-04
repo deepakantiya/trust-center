@@ -4,8 +4,8 @@
 |---|---|
 | **Standard** | AICPA Trust Services Criteria (2017, updated 2022) |
 | **Owner** | CISO / GRC Lead |
-| **Version** | 1.0 |
-| **Effective** | YYYY-MM-DD |
+| **Version** | 2.0 |
+| **Effective** | 2026-05-04 |
 | **Review** | Annual (pre-audit) |
 | **Related** | [`../../controls/control-matrix.md`](../../controls/control-matrix.md) |
 
@@ -20,170 +20,151 @@
 | **Testing** | Auditor inspects control design only | Auditor tests controls operated throughout the period (sampling) |
 | **Evidence volume** | Moderate (policies, configurations) | High (tickets, logs, screenshots, access review records for each sample) |
 | **Sampling** | Not applicable | Required — auditor selects samples from the population |
-| **Exceptions** | N/A | Any sample that fails is an "exception" and must be explained or remediated |
-| **Customer value** | Demonstrates intent | Demonstrates execution — customers and enterprise procurement prefer Type II |
 
 ---
 
-## 2. Audit Period Planning
+## 2. Trust Services Criteria to Trust Center Control Mapping
 
-### Recommended Timeline
-
-| Milestone | Target Date | Notes |
-|---|---|---|
-| Controls in steady-state (Type I readiness) | T-0 | All controls from `control-matrix.md` showing ✅ |
-| Audit period start | T+0 | Formally notify auditor; evidence collection begins |
-| Midpoint internal review | T+3 months | Test a sample of controls internally; fix exceptions early |
-| Pre-audit readiness assessment | T+5 months | Dry-run with auditor or internal GRC team |
-| Audit period end | T+6 months | Evidence collection closes |
-| Auditor fieldwork begins | T+6 to T+8 | Auditor requests evidence packages; expect 4–6 weeks |
-| Draft report issued | T+9 | Review for factual accuracy; respond to exceptions |
-| Final report issued | T+10 | Distribute to customers under NDA |
-
----
-
-## 3. Operating Effectiveness: What Auditors Test
-
-### Evidence Populations and Sample Sizes
-
-Auditors select samples from populations. The larger the population, the larger the sample. Common guidance (PCAOB / AICPA):
-
-| Population Size | Typical Sample Size |
-|---|---|
-| 1–5 occurrences | 100% (all) |
-| 6–25 occurrences | 5–10 |
-| 26–50 occurrences | 15–25 |
-| >50 occurrences | 25–60 |
-
-### Per-Criterion Testing Guide
-
-| TSC Criterion | Control | Population | What Auditor Samples | Evidence Format |
-|---|---|---|---|---|
-| CC6.1 | MFA enforced for all users | All user accounts | Screenshots of MFA settings; AD / IdP config | IdP export + screenshot |
-| CC6.2 | Quarterly access reviews | 4 quarterly reviews | Review completion records; approver sign-off | Email/ticket + export |
-| CC6.3 | Access removed within 24h of termination | All terminations in period | HR offboarding tickets; IdP deprovisioning timestamp | HR system + IdP log |
-| CC6.6 | Vulnerability scans run monthly | 6 monthly scans | Scan reports (all systems); no critical CVEs unaddressed | Scan tool export |
-| CC7.2 | SIEM alerts reviewed daily | All alert days in period | Alert queue screenshots; on-call records | SIEM dashboard export |
-| CC7.4 | Incidents managed per IR plan | All incidents in period | IR tickets; postmortem docs; notification records | JIRA / ticketing system |
-| CC8.1 | Changes go through PR review | All production deployments | PRs with reviewer; CI passing; approval before merge | GitHub/GitLab PR list |
-| CC9.2 | Annual vendor review | All Tier 1 vendors | Vendor assessment records; risk ratings | GRC tool export |
-| A1.2 | Backups tested quarterly | 4 quarterly restore tests | Restore test runbook; success confirmation | Restore test records |
-| CC4.1 | Control testing conducted | Annual schedule | Test workpapers; findings and remediation | GRC workpapers |
-
----
-
-## 4. Exception Management
-
-An **exception** occurs when a sample fails the test. Exceptions do not automatically result in a qualified opinion, but they must be addressed:
-
-| Severity | Definition | Response |
-|---|---|---|
-| **Isolated exception** | 1–2 failures in a large population with clear root cause | Document root cause + corrective action; auditor may note but not qualify |
-| **Systemic exception** | Pattern of failures indicating control is not operating | Requires management response letter + remediation plan; likely impacts report |
-| **Material weakness** | Control critical to the TSC is not operating and no compensating control exists | May result in qualified opinion; immediate remediation required |
-
-### Exception Response Checklist
-
-- [ ] Document the specific control, date, and nature of the failure
-- [ ] Perform root-cause analysis (RCA) — was it a process failure, tool failure, or human error?
-- [ ] Determine if the failure was isolated or systemic
-- [ ] Identify and document any compensating controls that mitigated the risk
-- [ ] Implement corrective action with owner and target date
-- [ ] Communicate to auditor with full context before the management response deadline
-
----
-
-## 5. Continuous Monitoring Controls
-
-Type II requires controls to operate *continuously* throughout the audit period. These controls should be automated or have automated evidence collection:
-
-| Control | Automation Status | Evidence Collection Method |
-|---|---|---|
-| MFA enforcement | ✅ Automated (IdP policy) | Monthly IdP config snapshot |
-| Vulnerability scanning | ✅ Automated (scanner) | Weekly scan reports auto-exported to `evidence/` |
-| SIEM alerting | ✅ Automated (SIEM) | Daily alert queue export; on-call acknowledgement logs |
-| Backup execution | ✅ Automated (backup tool) | Backup job success logs; monthly summary |
-| Access review | 🟡 Semi-automated (reminder + manual) | Quarterly calendar invite + signed-off export |
-| Offboarding deprovisioning | 🟡 Semi-automated (checklist + HR ticket) | HR ticket with deprovisioning timestamp |
-| Vendor review | 🔴 Manual | Annual calendar event + assessment records |
-
----
-
-## 6. Pre-Audit Evidence Package Checklist
-
-Prepare this package **before** the auditor arrives:
-
-### Organizational Evidence
-- [ ] Org chart (current)
-- [ ] CISO / security team role descriptions
-- [ ] Board / leadership security meeting minutes (from audit period)
-- [ ] All security policies with version history and approval dates
-
-### Access Control Evidence
-- [ ] MFA configuration screenshot / export (beginning + end of period)
-- [ ] RBAC / permission matrix for production systems
-- [ ] All access provisioning tickets from audit period (sample-ready list)
-- [ ] All termination tickets from audit period with deprovisioning timestamps
-- [ ] All quarterly access review records (4 × quarterly)
-
-### Vulnerability & Monitoring Evidence
-- [ ] All vulnerability scan reports from audit period
-- [ ] SIEM dashboard screenshots (monthly)
-- [ ] Patch application records for Critical/High CVEs (within SLA)
-- [ ] Annual external penetration test report
-
-### Change Management Evidence
-- [ ] List of all production deployments from audit period
-- [ ] Sample of PRs showing: reviewer approval, CI passing, no direct push to main
-
-### Incident Management Evidence
-- [ ] IR plan + last test/tabletop date
-- [ ] All incident tickets from audit period (including P1/P2)
-- [ ] Post-incident review documents
-
-### Backup & Recovery Evidence
-- [ ] Backup policy
-- [ ] All backup job success logs from audit period
-- [ ] Quarterly restore test records (4)
-
-### Vendor Management Evidence
-- [ ] Vendor register (current)
-- [ ] Annual vendor review records for all Tier 1 vendors
-- [ ] Sample of vendor security addenda / DPAs
-
----
-
-## 7. Auditor Communication Tips
-
-- Designate a **single GRC point of contact** (POC) for all auditor requests
-- Respond to evidence requests within **2 business days** — delays extend fieldwork and increase cost
-- Never provide access to production systems; provide **exports, screenshots, and logs** instead
-- If a control changed during the audit period, proactively disclose it and provide evidence for both states
-- Review the draft report carefully — factual errors are easier to correct than inferences
-
----
-
-
-
----
-
-## Processing Integrity (PI) — Testing Guide
-
-*Note: Processing Integrity criteria are in scope only if the organization provides transaction-processing services. Document the scoping decision.*
-
-| TSC Criterion | Control | Population | What Auditor Samples | Evidence Format |
-|---|---|---|---|---|
-| PI1.1 | Data processing definitions documented | All processing activities | Data flow diagrams; API specifications | Documentation exports |
-| PI1.2 | Input validation controls | All input touchpoints | Validation logic; error handling samples | Code review; SAST report |
-| PI1.3 | Processing reconciliation | All batch jobs | Reconciliation records; error queue metrics | Job logs; reconciliation reports |
-| PI1.4 | Output validation | All report/export endpoints | Validation logic; audit trails | Code review; audit logs |
-| PI1.5 | Database integrity checks | All critical databases | Integrity check schedules; results | Database logs; constraint documentation |
-
-
----
-
-## Revision History
-
-| Version | Date | Author | Changes |
+| TSC Category | Criteria | Trust Center Controls | Count |
 |---|---|---|---|
-| 1.0 | YYYY-MM-DD | GRC Lead | Initial Type II readiness guide |
+| **CC — Security (Common Criteria)** | CC1–CC9 | OM-*, CM-*, AS-*, NS-*, VM-*, IR-*, RA-* | 47 |
+| **A — Availability** | A1 | AV-01 to AV-04 | 4 |
+| **C — Confidentiality** | C1 | CF-01 to CF-04 | 4 |
+| **PI — Processing Integrity** | PI1 | (Scoped out — see exclusions) | 0 |
+| **P — Privacy** | P1–P8 | CO-06 (Privacy Policy) | 1 |
+
+---
+
+## 3. Control Testing by Category
+
+### Change Management (CC8)
+| Control ID | Control | Sampling Approach |
+|---|---|---|
+| CM-01 | Segregation of Environments | Inspect architecture diagrams, network configs |
+| CM-02 | Secure Development Policy | Review policy document and approval records |
+| CM-03 | Production Data Use Restricted | Sample dev/staging environments for production data |
+| CM-04 | Software Change Testing | Sample 25 deployments, verify test evidence |
+| CM-05 | Baseline Configurations | Inspect configuration management tool |
+| CM-06 | Configuration & Asset Management Policy | Review policy document |
+| CM-07 | Approval for System Changes | Sample 25 change requests, verify approvals |
+| CM-08 | Change Management Policy | Review policy document |
+
+### Availability (A1)
+| Control ID | Control | Sampling Approach |
+|---|---|---|
+| AV-01 | Testing BC/DR Plan | Review latest BC/DR test report |
+| AV-02 | BC/DR Policy | Review policy document |
+| AV-03 | Uptime & Availability Monitoring | Inspect monitoring dashboards, alert history |
+| AV-04 | Backup Restoration Testing | Review restoration test report |
+
+### Access Security (CC6)
+| Control ID | Control | Sampling Approach |
+|---|---|---|
+| AS-01 | Admin Access Restricted | Sample admin user lists, verify justifications |
+| AS-02 | Product Access Restricted | Review access key inventory |
+| AS-03 | Removal of Access | Sample 25 terminations, verify access revoked |
+| AS-04 | Encryption-at-Rest | Inspect encryption configurations |
+| AS-05 | Asset Inventory | Review asset inventory document |
+| AS-06 | User Access Reviews | Sample 2 quarterly access reviews |
+| AS-07 | Least Privilege in Use | Sample 25 access requests, verify least privilege |
+| AS-08 | Access Control & Termination Policy | Review policy document |
+| AS-09 | Unique Access IDs | Inspect IdP user list for duplicates |
+| AS-10 | Encryption & Key Management Policy | Review policy document |
+
+### Incident Response (CC7)
+| Control ID | Control | Sampling Approach |
+|---|---|---|
+| IR-01 | Tracking Security Incidents | Sample incident tickets |
+| IR-02 | Lessons Learned | Review post-incident documentation |
+| IR-03 | IR Plan Testing | Review IR test report |
+| IR-04 | Incident Response Plan | Review IR plan document |
+
+### Risk Assessment (CC3, CC9)
+| Control ID | Control | Sampling Approach |
+|---|---|---|
+| RA-01 | Vendor Due Diligence Review | Sample 25 vendors, verify SOC 2 reports collected |
+| RA-02 | Risk Assessment | Review annual risk assessment |
+| RA-03 | Risk Assessment & Treatment Policy | Review policy document |
+| RA-04 | Vendor Risk Assessment | Sample new vendor assessments |
+| RA-05 | Risk Register | Review risk register |
+| RA-06 | Vendor Risk Management Policy | Review policy document |
+
+### Vulnerability Management (CC7)
+| Control ID | Control | Sampling Approach |
+|---|---|---|
+| VM-01 | Vuln & Patch Management Policy | Review policy, sample patch tickets |
+| VM-02 | Third-Party Penetration Test | Review pen test report and remediation tracking |
+
+### Network Security (CC6, CC7)
+| Control ID | Control | Sampling Approach |
+|---|---|---|
+| NS-01 | Network Security Policy | Review policy document |
+| NS-02 | Endpoint Security | Review MDM/EDR compliance reports |
+| NS-03 | Automated Alerting | Inspect alert configurations, test alerts |
+
+### Organizational Management (CC1, CC4, CC5)
+| Control ID | Control | Sampling Approach |
+|---|---|---|
+| OM-01 | Security Program Review | Review annual policy review records |
+| OM-02 | Organizational Chart | Inspect current org chart |
+| OM-03 | Performance Reviews | Sample HR records |
+| OM-04 | New Hire Screening | Sample 25 hires, verify background checks |
+| OM-05 | Disciplinary Action | Review policy |
+| OM-06 | Performance Review Policy | Review policy |
+| OM-07 | Cybersecurity Insurance | Review insurance certificate |
+| OM-08 | Roles & Responsibilities | Review job descriptions, RACI |
+| OM-09 | Information Security Policy | Review policy document |
+| OM-10 | Acceptable Use Policy | Review policy and acknowledgements |
+| OM-11 | Internal Control Policy | Review policy document |
+| OM-12 | Code of Conduct | Review document and acknowledgements |
+
+### Confidentiality (C1)
+| Control ID | Control | Sampling Approach |
+|---|---|---|
+| CF-01 | Data Classification Policy | Review policy document |
+| CF-02 | Disposal of Customer Data | Sample deletion requests |
+| CF-03 | Data Retention & Disposal Policy | Review policy document |
+| CF-04 | Customer Data Access Restricted | Sample access lists |
+
+### Communications (CC2, P)
+| Control ID | Control | Sampling Approach |
+|---|---|---|
+| CO-01 | Terms of Service | Verify ToS published |
+| CO-02 | Communication of Critical Info | Review status page, communications |
+| CO-03 | Confidential Reporting Channel | Verify channel exists |
+| CO-04 | Security Commitments Communication | Verify security page |
+| CO-05 | Description of Services | Verify service descriptions |
+| CO-06 | Privacy Policy | Verify Privacy Policy published |
+
+---
+
+## 4. Evidence Folder Structure
+
+```
+evidence/
+├── policies/                    # All policy documents
+├── change-management/           # CM-01 to CM-08 evidence
+├── availability/                # AV-01 to AV-04 evidence
+├── access-security/             # AS-01 to AS-10 evidence
+├── incident-response/           # IR-01 to IR-04 evidence
+├── risk-assessment/             # RA-01 to RA-06 evidence
+├── vulnerability-management/    # VM-01 to VM-02 evidence
+├── network-security/            # NS-01 to NS-03 evidence
+├── organizational-management/   # OM-01 to OM-12 evidence
+├── confidentiality/             # CF-01 to CF-04 evidence
+├── communications/              # CO-01 to CO-06 evidence
+└── sampling-workpapers/         # Auditor sampling selections
+```
+
+---
+
+## 5. Pre-Audit Checklist
+
+- [ ] All 58 controls documented in control matrix
+- [ ] Evidence folder structure populated
+- [ ] Quarterly testing completed per [`testing-procedures.md`](testing-procedures.md)
+- [ ] All policies reviewed within last 12 months
+- [ ] Access reviews completed for audit period
+- [ ] Penetration test completed within last 12 months
+- [ ] BC/DR test completed within last 12 months
+- [ ] Risk assessment completed within last 12 months
