@@ -163,6 +163,25 @@ Prepare this package **before** the auditor arrives:
 
 ---
 
+
+
+---
+
+## Processing Integrity (PI) — Testing Guide
+
+*Note: Processing Integrity criteria are in scope only if the organization provides transaction-processing services. Document the scoping decision.*
+
+| TSC Criterion | Control | Population | What Auditor Samples | Evidence Format |
+|---|---|---|---|---|
+| PI1.1 | Data processing definitions documented | All processing activities | Data flow diagrams; API specifications | Documentation exports |
+| PI1.2 | Input validation controls | All input touchpoints | Validation logic; error handling samples | Code review; SAST report |
+| PI1.3 | Processing reconciliation | All batch jobs | Reconciliation records; error queue metrics | Job logs; reconciliation reports |
+| PI1.4 | Output validation | All report/export endpoints | Validation logic; audit trails | Code review; audit logs |
+| PI1.5 | Database integrity checks | All critical databases | Integrity check schedules; results | Database logs; constraint documentation |
+
+
+---
+
 ## Revision History
 
 | Version | Date | Author | Changes |
