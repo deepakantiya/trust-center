@@ -187,6 +187,75 @@ Run these procedures **quarterly** as an internal control test. Document finding
 
 ---
 
+
+
+---
+
+## PI — Processing Integrity
+
+*Note: Processing Integrity criteria are typically in scope only for transaction-processing systems. If PI is not in scope, document the exclusion rationale.*
+
+### TEST-PI1.1 — Data Processing Definitions
+| Field | Detail |
+|---|---|
+| **Criterion** | PI1.1 |
+| **Objective** | Verify data processing activities are defined and documented |
+| **Procedure** | 1. Review data processing inventory / data flow diagrams. 2. Verify processing activities are documented in API contracts or system specifications. 3. Confirm documentation is reviewed and updated at least annually. |
+| **Pass criteria** | Processing activities are documented; documentation dated within 12 months |
+| **Evidence** | Data dictionary; API contracts; system specifications |
+| **Test Result** | ☐ Pass  ☐ Fail  ☐ Exception  ☐ N/A (PI not in scope) |
+
+---
+
+### TEST-PI1.2 — Input Validation
+| Field | Detail |
+|---|---|
+| **Criterion** | PI1.2 |
+| **Objective** | Verify system inputs are validated for completeness and accuracy |
+| **Procedure** | 1. Review input validation controls in code (SAST findings, code review). 2. Select 5 critical input fields and verify validation logic exists. 3. Review error handling for invalid inputs. |
+| **Pass criteria** | Input validation implemented for critical fields; validation errors logged |
+| **Evidence** | Code review samples; SAST report; error log samples |
+| **Test Result** | ☐ Pass  ☐ Fail  ☐ Exception  ☐ N/A (PI not in scope) |
+
+---
+
+### TEST-PI1.3 — Processing Accuracy
+| Field | Detail |
+|---|---|
+| **Criterion** | PI1.3 |
+| **Objective** | Verify data processing is complete, accurate, and timely |
+| **Procedure** | 1. Review reconciliation procedures for batch jobs. 2. Select 3 critical processing jobs and verify reconciliation records. 3. Review error queue handling procedures. |
+| **Pass criteria** | Reconciliation performed for critical jobs; error queues monitored |
+| **Evidence** | Job logs; reconciliation reports; error queue metrics |
+| **Test Result** | ☐ Pass  ☐ Fail  ☐ Exception  ☐ N/A (PI not in scope) |
+
+---
+
+### TEST-PI1.4 — Output Validation
+| Field | Detail |
+|---|---|
+| **Criterion** | PI1.4 |
+| **Objective** | Verify system outputs are complete and accurate |
+| **Procedure** | 1. Review output validation controls. 2. Select 3 critical reports/exports and verify validation logic. 3. Review audit trail for output generation. |
+| **Pass criteria** | Output validation implemented; audit trails maintained |
+| **Evidence** | Output validation code; audit log samples |
+| **Test Result** | ☐ Pass  ☐ Fail  ☐ Exception  ☐ N/A (PI not in scope) |
+
+---
+
+### TEST-PI1.5 — Stored Data Integrity
+| Field | Detail |
+|---|---|
+| **Criterion** | PI1.5 |
+| **Objective** | Verify stored information is complete and accurate |
+| **Procedure** | 1. Review database integrity controls (constraints, triggers). 2. Verify database integrity checks run periodically. 3. Review backup verification procedures. |
+| **Pass criteria** | Database constraints enforced; integrity checks scheduled |
+| **Evidence** | Database schema; integrity check logs; backup verification records |
+| **Test Result** | ☐ Pass  ☐ Fail  ☐ Exception  ☐ N/A (PI not in scope) |
+
+
+---
+
 ## Revision History
 
 | Version | Date | Author | Changes |
