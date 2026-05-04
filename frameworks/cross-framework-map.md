@@ -1,276 +1,154 @@
 # Cross-Framework Control Map
 
-Maps every major control domain to specific requirements across all six frameworks. A single well-implemented control can satisfy multiple auditors — this map makes that explicit.
+Maps every Trust Center control to specific requirements across all compliance frameworks. A single well-implemented control can satisfy multiple auditors — this map makes that explicit.
 
 **Frameworks:** SOC 2 Type II · ISO 27001:2022 · ISO/SAE 21434:2021 · CMMC Level 1 · CMMC Level 2 · NIST SP 800-53 Rev 5
 
-**Legend:** ✅ covered · 🟡 partial · 🔴 gap · ⚪ N/A · — not required by this framework
+**Legend:** ✅ covered · 🟡 partial · ⚪ N/A · — not required by this framework
 
 ---
 
-## 1. Governance & Policy
+## Change Management Controls
 
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Information security policy published & approved | CC1.3, CC5.3 | 5.1 | 5.4.1 | — | CA.2.157 | PL-1, PM-1 |
-| Security roles & responsibilities defined | CC1.3 | 5.2 | 5.4.2 | — | CA.2.157 | PM-2 |
-| Policy review cadence (≥ annual) | CC5.3 | 5.1 | 5.4.1 | — | CA.2.157 | PL-1 |
-| Acceptable use policy | CC5.3 | 5.10 | — | — | AT.2.056 | PL-4 |
-| Contact with authorities & special interest groups | CC2.2 | 5.5, 5.6 | 5.4.4 | — | IR.2.092 | PM-15 |
-
----
-
-## 2. Human Resources & Training
-
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Background screening | CC1.4 | 6.1 | 5.4.2 | — | PS.2.127 | PS-3 |
-| Security awareness training (annual) | CC1.4 | 6.3 | 5.4.2 | — | AT.2.056 | AT-2 |
-| Role-based cybersecurity training | CC1.4 | 6.3 | 5.4.2 | — | AT.3.058 | AT-3 |
-| Terms of employment including security responsibilities | CC1.4, CC1.5 | 6.2 | — | — | PS.2.127 | PS-6 |
-| Disciplinary process | CC1.5 | 6.4 | — | — | PS.2.127 | PS-8 |
-| Return of assets on termination | CC6.3 | 6.5 | — | — | MP.1.001 | PS-4 |
-| Confidentiality / NDA agreements | CC1.4 | 6.6 | — | — | — | PS-6 |
-| Remote working policy | CC6.6 | 6.7 | — | — | AC.2.006 | AC-17 |
-| Reporting of information security events | CC7.3 | 6.8 | 15.4 | — | IR.2.092 | IR-6 |
+| Control ID | Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|---|
+| CM-01 | Segregation of Environments | CC8.1 | 8.31 | 7.4.2 | — | CM.2.062 | CM-4 |
+| CM-02 | Secure Development Policy | CC8.1 | 8.25 | 5.4.1 | — | SA.3.169 | SA-3 |
+| CM-03 | Production Data Use Restricted | C1.1 | 8.33 | — | — | CM.2.062 | CM-4 |
+| CM-04 | Software Change Testing | CC8.1 | 8.29 | 7.4.4 | — | CM.2.062 | CM-3 |
+| CM-05 | Baseline Configurations | CC8.1 | 8.9 | 7.4.3 | — | CM.2.061 | CM-2 |
+| CM-06 | Configuration & Asset Management Policy | CC8.1 | 5.9 | 5.4.5 | — | CM.2.064 | CM-1 |
+| CM-07 | Approval for System Changes | CC8.1 | 8.32 | 7.4.5 | — | CM.2.062 | CM-3 |
+| CM-08 | Change Management Policy | CC8.1 | 5.37 | 5.4.1 | — | CM.2.064 | CM-1 |
 
 ---
 
-## 3. Asset Management
+## Availability Controls
 
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Inventory of information assets | CC5.2 | 5.9 | — | — | CM.2.061 | CM-8 |
-| Acceptable use of assets | CC5.3 | 5.10 | — | — | AC.1.001 | PL-4 |
-| Return of assets | CC6.3 | 5.11 | — | — | MP.1.001 | PS-4 |
-| Data classification scheme | C1.1 | 5.12 | — | — | MP.2.119 | RA-2 |
-| Labelling of information | C1.1 | 5.13 | — | — | MP.2.119 | RA-2 |
-| Transfer of assets | CC6.7 | 5.14 | — | — | MP.3.122 | MP-5 |
+| Control ID | Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|---|
+| AV-01 | Testing BC/DR Plan | A1.3 | 5.30 | — | — | CP.2.116 | CP-4 |
+| AV-02 | BC/DR Policy | A1.2 | 5.29 | — | — | CP.2.116 | CP-1 |
+| AV-03 | Uptime & Availability Monitoring | A1.1 | 8.16 | 9.5 | — | SI.2.216 | SI-4 |
+| AV-04 | Backup Restoration Testing | A1.2 | 8.13 | — | — | CP.2.116 | CP-9 |
 
 ---
 
-## 4. Access Control
+## Organizational Management Controls
 
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Access control policy | CC6.1 | 5.15 | — | AC.1.001 | AC.1.001 | AC-1 |
-| Identity management | CC6.1 | 5.16 | 8.6 | AC.1.002 | AC.1.002 | IA-2, IA-4 |
-| Authentication (MFA for privileged) | CC6.1 | 5.17, 8.5 | 8.6 | IA.1.076 | IA.1.076, IA.3.083 | IA-2, IA-5 |
-| Access rights management | CC6.2 | 5.18 | — | — | AC.2.006 | AC-2, AC-6 |
-| Privileged access management | CC6.1, CC6.2 | 8.2 | 8.6 | — | AC.2.006 | AC-6 |
-| Secret authentication information (passwords) | CC6.1 | 5.17 | — | IA.1.077 | IA.1.077 | IA-5 |
-| Access review (quarterly) | CC6.2 | 5.18 | — | — | AC.2.013 | AC-2 |
-| Removal of access rights (offboarding ≤24h) | CC6.3 | 5.18 | — | AC.1.001 | AC.1.001 | AC-2, PS-4 |
-| Segregation of duties | CC6.1 | 5.3 | — | — | AC.2.006 | AC-5 |
-
----
-
-## 5. Cryptography
-
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Cryptography policy | CC6.1, CC6.7 | 5.31 | 8.9 | — | SC.3.177 | SC-12, SC-13 |
-| Key management | CC6.1 | 5.31 | 8.9 | — | SC.3.187 | SC-12 |
-| Encryption of data at rest | CC6.1 | 8.24 | 8.9 | — | SC.3.177 | SC-28 |
-| Encryption of data in transit | CC6.7 | 8.24 | 8.9 | SC.1.175 | SC.1.175 | SC-8 |
+| Control ID | Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|---|
+| OM-01 | Security Program Review | CC4.1 | 5.35 | 5.4.1 | — | CA.2.157 | CA-2 |
+| OM-02 | Organizational Chart | CC1.3 | 5.2 | 5.4.2 | — | — | PM-2 |
+| OM-03 | Performance Reviews | CC1.5 | 6.4 | — | — | PS.2.128 | PS-2 |
+| OM-04 | New Hire Screening | CC1.4 | 6.1 | — | — | PS.2.127 | PS-3 |
+| OM-05 | Disciplinary Action | CC1.5 | 6.4 | — | — | PS.2.128 | PS-8 |
+| OM-06 | Performance Review Policy | CC1.5 | 6.4 | — | — | PS.2.128 | PS-2 |
+| OM-07 | Cybersecurity Insurance | CC9.1 | — | — | — | — | PM-8 |
+| OM-08 | Roles & Responsibilities | CC1.3 | 5.2 | 5.4.2 | — | CA.2.157 | PM-2 |
+| OM-09 | Information Security Policy | CC5.3 | 5.1 | 5.4.1 | — | CA.2.157 | PL-1 |
+| OM-10 | Acceptable Use Policy | CC5.3 | 5.10 | — | — | AT.2.056 | PL-4 |
+| OM-11 | Internal Control Policy | CC5.1 | 5.1 | — | — | CA.2.157 | PL-1 |
+| OM-12 | Code of Conduct | CC1.1 | 5.4 | — | — | AT.2.056 | PL-4 |
 
 ---
 
-## 6. Physical & Environmental Security
+## Confidentiality Controls
 
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Physical security perimeters | CC6.4 | 7.1 | — | PE.1.131 | PE.1.131 | PE-3 |
-| Physical entry controls (badge/biometric) | CC6.4 | 7.2 | — | PE.1.131 | PE.1.131 | PE-2, PE-3 |
-| Protection of offices, rooms, facilities | CC6.4 | 7.3 | — | PE.1.131 | PE.1.132 | PE-3 |
-| Monitoring physical access (CCTV/logs) | CC6.4 | 7.4 | — | PE.1.131 | PE.1.131 | PE-6 |
-| Working in secure areas | CC6.4 | 7.5 | — | PE.1.131 | PE.1.131 | PE-5 |
-| Clear desk / clear screen | CC6.4 | 7.7 | — | — | PE.2.135 | PE-5 |
-| Equipment siting and protection | CC6.4 | 7.8 | — | PE.1.131 | PE.1.131 | PE-9 |
-| Security of assets off-premises | CC6.5 | 7.9 | — | — | MP.1.001 | PE-17 |
-| Storage media management | CC6.5 | 7.10 | — | MP.1.001 | MP.1.001 | MP-2, MP-4 |
-| Supporting utilities (UPS, HVAC) | A1.1 | 7.11 | — | — | — | PE-9, PE-11 |
-| Cabling security | A1.1 | 7.12 | — | — | — | PE-9 |
-| Equipment maintenance | A1.1 | 7.13 | — | — | — | MA-2 |
-| Secure disposal / repurposing of equipment | CC6.5 | 7.14 | — | MP.1.001 | MP.1.001 | MP-6 |
+| Control ID | Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|---|
+| CF-01 | Data Classification Policy | C1.1 | 5.12 | 8.3 | — | — | RA-2 |
+| CF-02 | Disposal of Customer Data | C1.2 | 5.13 | — | — | MP.3.122 | MP-6 |
+| CF-03 | Data Retention & Disposal Policy | C1.2 | 5.13 | — | — | MP.3.122 | MP-6 |
+| CF-04 | Customer Data Access Restricted | C1.1 | 5.15 | 8.6 | AC.1.001 | AC.1.001 | AC-3 |
 
 ---
 
-## 7. Operations Security
+## Vulnerability Management Controls
 
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Documented operating procedures | CC5.3 | 8.1 | — | — | CM.2.061 | CM-1 |
-| Change management | CC8.1 | 8.32 | 9.3 | — | CM.3.068 | CM-3 |
-| Capacity management | A1.1 | 8.6 | — | — | — | CP-2 |
-| Separation of dev/test/prod | CC8.1 | 8.31 | 10.4.2 | — | CM.2.062 | CM-2, SA-3 |
-| Malware protection (EDR/AV) | CC6.8 | 8.7 | — | SI.1.210 | SI.1.210 | SI-3 |
-| Vulnerability management (scanning ≤30 days) | CC7.1 | 8.8 | — | — | RM.2.141 | RA-5 |
-| Patch management | CC7.1 | 8.8 | 14.1 | SI.1.211 | SI.1.211 | SI-2 |
-| Audit logging (SIEM) | CC7.2 | 8.15, 8.17 | — | — | AU.2.041 | AU-2, AU-12 |
-| Log protection (immutable, ≥90 day retention) | CC7.2 | 8.15 | — | — | AU.2.042 | AU-9 |
-| Clock synchronisation (NTP) | CC7.2 | 8.17 | — | — | AU.2.042 | AU-8 |
-| Install controls (allowlisting / app control) | CC6.8 | 8.19 | — | — | CM.2.064 | CM-7 |
-| Network management | CC6.6 | 8.20 | 8.7 | SC.1.175 | SC.1.175 | SC-7 |
-| Web filtering | CC6.6 | 8.23 | — | — | SC.3.192 | SI-3, SC-7 |
-| Backup and restore (tested quarterly) | A1.2 | 8.13 | — | — | RE.2.137 | CP-9 |
+| Control ID | Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|---|
+| VM-01 | Vuln & Patch Management Policy | CC7.1 | 8.8 | 8.4 | — | SI.2.214 | SI-2 |
+| VM-02 | Third-Party Penetration Test | CC4.1 | 8.8 | 9.5 | — | CA.2.158 | CA-8 |
 
 ---
 
-## 8. Communications Security
+## Incident Response Controls
 
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Network segregation | CC6.6 | 8.22 | 8.7 | SC.1.175 | SC.1.175 | SC-7 |
-| Information transfer policies | CC6.7 | 5.14 | — | MP.3.122 | MP.3.122 | AC-20, SC-8 |
-| Confidentiality / NDA agreements | CC1.4 | 6.6 | — | — | — | PS-6 |
-| Secure messaging / email controls | CC6.7 | 5.14, 8.24 | — | — | SC.3.177 | SC-8 |
-
----
-
-## 9. System Acquisition, Development & Maintenance
-
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Secure development policy | CC8.1 | 8.25 | 10.4 | — | SA.2.068 | SA-8, SA-15 |
-| Security requirements in SDLC | CC8.1 | 8.26 | 9.1 | — | SA.2.068 | SA-3 |
-| Secure coding practices | CC8.1 | 8.28 | 10.4.2 | — | SA.2.068 | SA-15 |
-| Security testing (SAST/DAST/pen test) | CC7.1 | 8.29 | 11.1 | — | SA.3.072 | SA-11, CA-8 |
-| Security in DevOps | CC8.1 | 8.30 | 10.4.2 | — | SA.2.068 | SA-10 |
-| System configuration standards (hardening) | CC5.2 | 8.9 | — | — | CM.2.061 | CM-6 |
-| Deletion of test data | CC6.5 | 8.33 | — | — | MP.2.119 | MP-6 |
+| Control ID | Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|---|
+| IR-01 | Tracking Security Incidents | CC7.3 | 5.25 | 13.3 | — | IR.2.093 | IR-6 |
+| IR-02 | Lessons Learned | CC7.4 | 5.27 | 13.4 | — | IR.2.092 | IR-4 |
+| IR-03 | IR Plan Testing | CC7.4 | 5.24 | 13.5 | — | IR.2.093 | IR-3 |
+| IR-04 | Incident Response Plan | CC7.4 | 5.24 | 13.3 | — | IR.2.093 | IR-8 |
 
 ---
 
-## 10. Supplier / Third-Party Risk
+## Risk Assessment Controls
 
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Supplier security policy | CC9.2 | 5.19 | 7.1 | — | SR.2.150 | SR-1, SA-9 |
-| Security in supplier agreements | CC9.2 | 5.20 | 7.3 | — | SR.2.150 | SA-9, SR-8 |
-| ICT supply chain management | CC9.2 | 5.21 | 7.1 | — | SR.3.169 | SR-3 |
-| Monitoring/review of supplier services | CC9.2 | 5.22 | 7.4 | — | SR.2.150 | SA-9, SR-6 |
-| Managing changes to supplier services | CC9.2, CC8.1 | 5.23 | 7.4 | — | SR.2.150 | SA-9, CM-3 |
-
----
-
-## 11. Incident Management
-
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Incident management plan / policy | CC7.3 | 5.24 | 15.1 | — | IR.2.092 | IR-1, IR-8 |
-| Detection and reporting of events | CC7.3 | 5.25, 6.8 | 15.4 | — | IR.2.092 | IR-6, SI-4 |
-| Assessment and decision on events | CC7.3 | 5.25 | 15.4 | — | IR.2.092 | IR-4 |
-| Response to security incidents | CC7.4 | 5.26 | 15.5 | — | IR.2.093 | IR-4, IR-5 |
-| Learning from security incidents | CC7.4 | 5.27 | 15.6 | — | IR.2.093 | IR-4 |
-| Collection of evidence (chain of custody) | CC7.4 | 5.28 | 15.5 | — | IR.3.098 | IR-4, AU-2 |
+| Control ID | Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|---|
+| RA-01 | Vendor Due Diligence Review | CC9.2 | 5.19 | 6.4.2 | — | SR.2.137 | SA-9 |
+| RA-02 | Risk Assessment | CC3.2 | 8.2 | 9.4 | — | RA.2.141 | RA-3 |
+| RA-03 | Risk Assessment & Treatment Policy | CC3.2 | 5.7 | 9.4 | — | RA.2.141 | RA-1 |
+| RA-04 | Vendor Risk Assessment | CC9.2 | 5.21 | 6.4.2 | — | SR.2.137 | SA-9 |
+| RA-05 | Risk Register | CC3.2 | 8.2 | 9.4 | — | RA.2.141 | RA-3 |
+| RA-06 | Vendor Risk Management Policy | CC9.2 | 5.19 | 6.4.1 | — | SR.2.137 | SA-4 |
 
 ---
 
-## 12. Business Continuity & Resilience
+## Network Security Controls
 
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| ICT continuity planning | A1.3 | 5.29, 5.30 | — | — | RE.2.137 | CP-2 |
-| Disaster recovery plan (tested annually) | A1.3 | 5.30 | — | — | RE.3.139 | CP-4, CP-10 |
-| Redundancy of infrastructure | A1.1 | 8.14 | — | — | — | CP-7, CP-8 |
-
----
-
-## 13. Risk Management
-
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Risk identification and assessment | CC3.2 | 6.1.2 | 9.4 (TARA) | — | RM.2.141 | RA-3, PM-9 |
-| Risk treatment | CC9.1 | 6.1.3 | 9.5 | — | RM.2.142 | RA-7 |
-| Statement of Applicability | CC5.1 | 6.1.3d | — | — | — | PL-2 |
-| Risk monitoring and review | CC4.1 | 8.2 | 8.3 | — | RM.2.141 | CA-7, RA-3 |
-| Compliance monitoring | CC4.1 | 5.35, 5.36 | 8.3 | — | CA.2.157 | CA-2, CA-7 |
+| Control ID | Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|---|
+| NS-01 | Network Security Policy | CC6.6 | 8.20 | 8.7 | — | SC.3.177 | SC-7 |
+| NS-02 | Endpoint Security | CC6.8 | 8.7 | — | — | SC.3.187 | SC-28 |
+| NS-03 | Automated Alerting for Security Events | CC7.2 | 8.16 | 9.5 | — | SI.2.217 | SI-4 |
 
 ---
 
-## 14. Automotive-Specific (ISO/SAE 21434 only)
+## Access Security Controls
 
-| Control | ISO/SAE 21434 Clause | Nearest Cross-Framework Analog |
+| Control ID | Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|---|
+| AS-01 | Admin Access Restricted | CC6.1 | 8.2 | 8.6 | AC.1.002 | AC.1.002 | AC-6 |
+| AS-02 | Product Access Restricted | CC6.1 | 8.3 | 8.6 | AC.1.002 | AC.2.007 | AC-17 |
+| AS-03 | Removal of Access | CC6.3 | 5.18 | — | AC.1.004 | AC.1.004 | AC-2 |
+| AS-04 | Encryption-at-Rest | CC6.1 | 8.24 | 8.9 | — | SC.3.177 | SC-28 |
+| AS-05 | Asset Inventory | CC6.1 | 5.9 | 5.4.5 | — | CM.2.061 | CM-8 |
+| AS-06 | User Access Reviews | CC6.2 | 5.18 | — | AC.1.001 | AC.2.013 | AC-2 |
+| AS-07 | Least Privilege in Use | CC6.1 | 5.15 | 8.6 | AC.1.002 | AC.1.002 | AC-6 |
+| AS-08 | Access Control & Termination Policy | CC6.3 | 5.11 | — | AC.1.004 | AC.1.004 | AC-1 |
+| AS-09 | Unique Access IDs | CC6.1 | 5.16 | — | IA.1.076 | IA.1.076 | IA-2 |
+| AS-10 | Encryption & Key Management Policy | CC6.7 | 8.24 | 8.9 | — | SC.3.177 | SC-12 |
+
+---
+
+## Communications Controls
+
+| Control ID | Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
+|---|---|---|---|---|---|---|---|
+| CO-01 | Terms of Service | CC2.3 | — | — | — | — | — |
+| CO-02 | Communication of Critical Info | CC2.2 | 5.5 | 5.4.4 | — | IR.2.092 | IR-7 |
+| CO-03 | Confidential Reporting Channel | CC1.1 | 5.5 | — | — | — | PM-15 |
+| CO-04 | Security Commitments Communication | CC2.3 | — | — | — | — | — |
+| CO-05 | Description of Services | CC2.2 | — | — | — | — | — |
+| CO-06 | Privacy Policy | P1 | 5.34 | — | — | — | PT-1 |
+
+---
+
+## Summary
+
+| Category | Controls | Primary SOC 2 Criteria |
 |---|---|---|
-| Cybersecurity management system (CSMS) | 5.4 | ISO 27001 § 4–6 (ISMS); NIST 800-53 PM-1 |
-| Threat Analysis & Risk Assessment (TARA) | 9.4, 15.3 | ISO 27001 6.1.2; SOC 2 CC3.2; NIST 800-53 RA-3 |
-| Cybersecurity concept / goals | 9.5, 9.6 | ISO 27001 6.1.3; SOC 2 CC5.1; NIST 800-53 PL-2 |
-| Product development security requirements | 10.4 | ISO 27001 8.25–8.26; SOC 2 CC8.1; NIST 800-53 SA-3, SA-8 |
-| Cybersecurity testing (vehicle level) | 11.1 | ISO 27001 8.29; SOC 2 CC7.1; NIST 800-53 SA-11, CA-8 |
-| Post-production monitoring | 13.3 | ISO 27001 8.8; SOC 2 CC7.2; NIST 800-53 SI-4, RA-5 |
-| End of cybersecurity support notification | 14.1 | ISO 27001 5.14; NIST 800-53 SR-8 |
-| Vulnerability disclosure for vehicles | 15.3 | ISO 27001 5.8; SOC 2 CC7.1; NIST 800-53 RA-5 |
-
----
-
----
-
-## 15. Privacy (P)
-
-*SOC 2 Privacy criteria for organizations processing personal information.*
-
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Privacy notice published and accessible | P1 | 5.34 | — | — | — | PT-5, TR-1 |
-| Choice and consent mechanisms | P2 | 5.34 | — | — | — | IP-1, IP-2 |
-| Data collection limitation | P3 | 5.34 | — | — | — | IP-1, AP-2 |
-| Use, retention, and disposal | P4 | 5.34 | — | — | — | DM-2, SI-12, MP-6 |
-| Data subject access requests | P5 | 5.34 | — | — | — | IP-3, IP-4 |
-| Disclosure and sharing with third parties | P6 | 5.34, 5.19 | — | — | — | AR-3, UL-2 |
-| Data quality and accuracy | P7 | 5.34 | — | — | — | DI-1, DI-2 |
-| Privacy monitoring and enforcement | P8 | 5.34 | — | — | — | AR-4, PM-26 |
-
----
-
-## 16. Processing Integrity (PI)
-
-*SOC 2 Processing Integrity criteria — typically in scope for transaction-processing systems.*
-
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Data processing definitions and documentation | PI1.1 | 8.1 | — | — | — | SA-4, SI-1 |
-| Input validation and completeness | PI1.2 | 8.25, 8.28 | 10.4.2 | — | — | SI-10 |
-| Processing accuracy and completeness | PI1.3 | 8.1, 8.25 | 10.4.2 | — | — | SI-10, SI-16 |
-| Output validation and accuracy | PI1.4 | 8.1 | — | — | — | SI-15 |
-| Stored data integrity verification | PI1.5 | 8.24, 8.10 | — | — | — | SI-7 |
-
----
-
-## 17. Additional Common Criteria Controls
-
-*Additional SOC 2 Common Criteria controls not covered in domain-specific sections above.*
-
-| Control | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Commitment to integrity and ethical values | CC1.1 | 5.4 | 5.4.1 | — | — | PL-4, PS-8 |
-| Board / executive oversight | CC1.2 | 5.4 | 5.4.1 | — | — | PM-1, PM-2 |
-| Uses quality information for decisions | CC2.1 | 5.7 | — | — | — | PM-16, RA-3 |
-| External communication of security posture | CC2.3 | 5.6 | 5.4.4 | — | IR.2.092 | PM-15 |
-| Security objectives specification | CC3.1 | 6.2 | — | — | — | PL-2, PM-9 |
-| Fraud risk consideration | CC3.3 | 5.7 | — | — | — | RA-3, SI-4 |
-| Change impact assessment | CC3.4 | 8.32 | 9.3 | — | CM.3.068 | CM-3, RA-3 |
-| Deficiency communication and remediation | CC4.2 | 9.3, 10.2 | — | — | CA.2.158 | CA-5 |
-| Incident recovery procedures | CC7.5 | 5.30 | — | — | RE.3.139 | CP-10, IR-4 |
-| Confidential information disposal | C1.2 | 8.10, 7.14 | — | MP.1.001 | MP.1.001 | MP-6, SI-12 |
-
----
-
-## Shared Evidence Register
-
-The following evidence artifacts satisfy **multiple frameworks simultaneously**. Collect once, cite everywhere.
-
-| Evidence Artifact | SOC 2 | ISO 27001 | ISO/SAE 21434 | CMMC L1 | CMMC L2 | NIST 800-53 |
-|---|---|---|---|---|---|---|
-| Access review records (quarterly) | CC6.2 | 5.18 | — | — | AC.2.013 | AC-2 |
-| Security awareness training completion | CC1.4 | 6.3 | 5.4.2 | — | AT.2.056 | AT-2, AT-3 |
-| Vulnerability scan reports | CC7.1 | 8.8 | — | — | RM.2.141 | RA-5 |
-| Penetration test report (annual) | CC4.1, CC7.1 | 8.8, 8.29 | 11.1 | — | SA.3.072 | CA-8, SA-11 |
-| Incident response records / postmortems | CC7.4 | 5.24–5.27 | 15.5 | — | IR.2.093 | IR-4, IR-8 |
-| Backup / restore test logs | A1.2 | 8.13 | — | — | RE.2.137 | CP-9 |
-| Vendor risk assessments | CC9.2 | 5.19–5.22 | 7.1–7.4 | — | SR.2.150 | SA-9, SR-6 |
-| Change management records (PRs, tickets) | CC8.1 | 8.32 | 9.3 | — | CM.3.068 | CM-3 |
-| MFA / SSO configuration screenshots | CC6.1 | 8.5 | 8.6 | IA.1.076 | IA.1.076 | IA-2, IA-5 |
-| Risk register (quarterly updates) | CC3.2, CC9.1 | 6.1.2 | 9.4 (TARA) | — | RM.2.141 | RA-3, PM-9 |
-| DR exercise reports | A1.3 | 5.30 | — | — | RE.3.139 | CP-4, CP-10 |
-| Policy approval records (signed) | CC5.3 | 5.1 | 5.4.1 | — | CA.2.157 | PL-1, PM-1 |
+| Change Management | CM-01 to CM-08 | CC8 |
+| Availability | AV-01 to AV-04 | A1 |
+| Organizational Management | OM-01 to OM-12 | CC1, CC4, CC5 |
+| Confidentiality | CF-01 to CF-04 | C1 |
+| Vulnerability Management | VM-01 to VM-02 | CC7 |
+| Incident Response | IR-01 to IR-04 | CC7 |
+| Risk Assessment | RA-01 to RA-06 | CC3, CC9 |
+| Network Security | NS-01 to NS-03 | CC6, CC7 |
+| Access Security | AS-01 to AS-10 | CC6 |
+| Communications | CO-01 to CO-06 | CC2, P |
+| **Total** | **58** | |
