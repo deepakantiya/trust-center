@@ -115,28 +115,50 @@ serve(async (req) => {
   const timestamp = Date.now();
   const expiresAt = new Date(Date.now() + SIGNED_URL_TTL * 1000).toISOString();
 
+  console.log("Starting PDF generation for request:", record.id);
+  console.log("Documents to generate:", validDocs);
+
   const results = await Promise.allSettled(
     validDocs.map(async (key) => {
       const doc = DOC_PATHS[key];
+      console.log(`[${key}] Starting generation from: ${doc.path}`);
 
       const { data: original, error: dlErr } = await supabase.storage
         .from("audit-docs")
         .download(doc.path);
-      if (dlErr || !original) throw new Error(`Download failed: ${doc.path}`);
+      if (dlErr || !original) {
+        const err = `[${key}] Download failed: ${doc.path} - ${dlErr?.message || 'No data returned'}`;
+        console.error(err);
+        throw new Error(err);
+      }
+      console.log(`[${key}] Downloaded, watermarking...`);
 
       const pdfBytes = new Uint8Array(await original.arrayBuffer());
       const watermarked = await watermarkPdf(pdfBytes, companyName.trim());
+      console.log(`[${key}] Watermarked (${watermarked.length} bytes)`);
 
       const uploadPath = `watermarked/${safeCompany}/${timestamp}_${doc.path}`;
+      console.log(`[${key}] Uploading to: ${uploadPath}`);
       const { error: upErr } = await supabase.storage
         .from("audit-docs")
         .upload(uploadPath, watermarked, { contentType: "application/pdf", upsert: true });
-      if (upErr) throw new Error(`Upload failed: ${uploadPath}`);
+      if (upErr) {
+        const err = `[${key}] Upload failed: ${uploadPath} - ${upErr?.message || 'Unknown error'}`;
+        console.error(err);
+        throw new Error(err);
+      }
+      console.log(`[${key}] Uploaded successfully`);
 
+      console.log(`[${key}] Generating 7-day signed URL...`);
       const { data: signed, error: signErr } = await supabase.storage
         .from("audit-docs")
         .createSignedUrl(uploadPath, SIGNED_URL_TTL);
-      if (signErr || !signed?.signedUrl) throw new Error(`Signed URL failed: ${uploadPath}`);
+      if (signErr || !signed?.signedUrl) {
+        const err = `[${key}] Signed URL failed: ${uploadPath} - ${signErr?.message || 'No signed URL returned'}`;
+        console.error(err);
+        throw new Error(err);
+      }
+      console.log(`[${key}] Generated signed URL (expires in ${SIGNED_URL_TTL} seconds)`);
 
       return { key, name: doc.name, icon: doc.icon, url: signed.signedUrl };
     }),
@@ -145,13 +167,17 @@ serve(async (req) => {
   const documentsOut: { key: string; name: string; icon: string; url: string }[] = [];
   for (const result of results) {
     if (result.status === "fulfilled") {
+      console.log(`✓ ${result.value.key} - generated successfully`);
       documentsOut.push(result.value);
     } else {
-      console.error("Document generation error:", result.reason);
+      console.error(`✗ Document generation failed:`, result.reason);
     }
   }
 
+  console.log(`PDF generation complete: ${documentsOut.length}/${validDocs.length} documents generated`);
+
   if (documentsOut.length === 0) {
+    console.error("No documents generated. See errors above.");
     return json({ error: "Failed to generate documents. Please try again later." }, 500);
   }
 
