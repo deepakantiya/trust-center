@@ -233,7 +233,7 @@ serve(async (req) => {
         emailRedirectTo: redirectUrl,
         data: {
           request_id: requestId,
-          company: company,
+          company_name: company,
           documents: documents,
         },
       },
