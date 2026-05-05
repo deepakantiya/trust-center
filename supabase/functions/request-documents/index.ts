@@ -143,12 +143,12 @@ serve(async (req) => {
     const { data: requestRecord, error: insertError } = await supabase
       .from('document_requests')
       .insert({
-        full_name: fullName,
-        email: email,
-        company_name: companyName,
+        name: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        company: companyName.trim(),
+        docs: documents,
         nda_accepted: true,
-        nda_accepted_at: new Date().toISOString(),
-        documents_requested: documents
+        status: 'pending'
       })
       .select()
       .single();
@@ -176,9 +176,9 @@ serve(async (req) => {
 
     // Generate signed URLs (7 days expiry)
     const expiresIn = 7 * 24 * 60 * 60; // 604800 seconds
-    const expiresAt = new Date(Date.now() + expiresIn * 1000);
-    const generatedUrls = [];
-    
+    const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
+    const generatedLinks = [];
+
     // Sanitize company name for filename
     const safeCompanyName = companyName.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
     const timestamp = Date.now();
@@ -196,6 +196,13 @@ serve(async (req) => {
 
         if (downloadError || !originalPdf) {
           console.error(`Failed to download ${doc.path}:`, downloadError);
+          // Add placeholder for missing document
+          generatedLinks.push({
+            key: docKey,
+            name: doc.name,
+            icon: doc.icon,
+            url: ''
+          });
           continue;
         }
 
@@ -205,7 +212,7 @@ serve(async (req) => {
 
         // 3. Upload watermarked PDF to temporary folder
         const watermarkedPath = `watermarked/${safeCompanyName}/${timestamp}_${doc.path}`;
-        
+
         const { error: uploadError } = await supabase
           .storage
           .from('audit-docs')
@@ -216,6 +223,12 @@ serve(async (req) => {
 
         if (uploadError) {
           console.error(`Failed to upload watermarked ${doc.path}:`, uploadError);
+          generatedLinks.push({
+            key: docKey,
+            name: doc.name,
+            icon: doc.icon,
+            url: ''
+          });
           continue;
         }
 
@@ -227,35 +240,52 @@ serve(async (req) => {
 
         if (signedUrlError || !signedUrlData?.signedUrl) {
           console.error(`Failed to create signed URL for ${watermarkedPath}:`, signedUrlError);
+          generatedLinks.push({
+            key: docKey,
+            name: doc.name,
+            icon: doc.icon,
+            url: ''
+          });
           continue;
         }
 
-        // 5. Store download record
-        await supabase.from('document_downloads').insert({
-          request_id: requestRecord.id,
-          document_type: docKey,
-          storage_path: watermarkedPath,
-          signed_url: signedUrlData.signedUrl,
-          expires_at: expiresAt.toISOString()
-        });
-
-        generatedUrls.push({
+        generatedLinks.push({
           key: docKey,
           name: doc.name,
           icon: doc.icon,
           url: signedUrlData.signedUrl
         });
-        
+
       } catch (docError) {
         console.error(`Error processing ${docKey}:`, docError);
+        generatedLinks.push({
+          key: docKey,
+          name: doc.name,
+          icon: doc.icon,
+          url: ''
+        });
         continue;
       }
     }
 
-    if (generatedUrls.length === 0) {
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Failed to generate document links. Please try again.' 
+    // Update the request record with generated links and status
+    const allGenerated = generatedLinks.every((l) => l.url !== "");
+    const { error: updateError } = await supabase
+      .from('document_requests')
+      .update({
+        links: generatedLinks,
+        status: allGenerated ? 'completed' : 'failed'
+      })
+      .eq('id', requestRecord.id);
+
+    if (updateError) {
+      console.error('Failed to update request with links:', updateError);
+    }
+
+    if (generatedLinks.length === 0) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Failed to generate document links. Please try again.'
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -266,8 +296,8 @@ serve(async (req) => {
       success: true,
       message: 'Your request has been approved! Personalized documents are ready for download.',
       requestId: requestRecord.id,
-      documents: generatedUrls,
-      expiresAt: expiresAt.toISOString()
+      documents: generatedLinks,
+      expiresAt: expiresAt
     }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
