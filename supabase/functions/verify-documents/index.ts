@@ -1,5 +1,5 @@
-// supabase/functions/request-documents/index.ts
-// Consolidated Edge Function with Magic Link authentication + PDF Watermarking
+// supabase/functions/verify-documents/index.ts
+// Verification endpoint that generates watermarked PDFs after magic link verification
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
@@ -13,13 +13,6 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SECRET_KEY = 
   Deno.env.get("SUPABASE_SECRET_KEY") ?? 
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-// Public base URL of the Vercel frontend
-const RAW_SITE_URL = Deno.env.get("SITE_BASE_URL") ?? "";
-// Normalize: strip protocol and trailing slashes for clean URL construction
-const SITE_BASE_URL = RAW_SITE_URL
-  .replace(/^https?:\/\//i, "")
-  .replace(/\/+$/, "");
 
 const STORAGE_BUCKET = "audit-docs";
 const LINK_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
@@ -121,51 +114,6 @@ async function watermarkPdf(pdfBytes: Uint8Array, companyName: string): Promise<
 }
 
 // ============================================================================
-// REQUEST VALIDATION
-// ============================================================================
-
-interface DocumentRequest {
-  fullName?: string;
-  full_name?: string;
-  email?: string;
-  company?: string;
-  documents?: string[];
-  ndaAgreed?: boolean;
-  nda_agreed?: boolean;
-}
-
-function validateRequest(body: DocumentRequest): { valid: true; data: { fullName: string; email: string; company: string; documents: string[]; ndaAgreed: boolean } } | { valid: false; error: string } {
-  // Accept both camelCase and snake_case
-  const fullName = body.fullName ?? body.full_name;
-  const ndaAgreed = body.ndaAgreed ?? body.nda_agreed;
-  const { email, company, documents } = body;
-
-  if (!fullName || typeof fullName !== "string") {
-    return { valid: false, error: "Full name is required" };
-  }
-  if (!email || typeof email !== "string" || !email.includes("@")) {
-    return { valid: false, error: "Valid email is required" };
-  }
-  if (!company || typeof company !== "string") {
-    return { valid: false, error: "Company name is required" };
-  }
-  if (!Array.isArray(documents) || documents.length === 0) {
-    return { valid: false, error: "At least one document must be selected" };
-  }
-  if (ndaAgreed !== true) {
-    return { valid: false, error: "NDA must be agreed to" };
-  }
-
-  // Filter to valid document keys
-  const validDocs = documents.filter((d) => typeof d === "string" && DOC_CONFIG[d]);
-  if (validDocs.length === 0) {
-    return { valid: false, error: "No valid documents selected" };
-  }
-
-  return { valid: true, data: { fullName, email, company, documents: validDocs, ndaAgreed } };
-}
-
-// ============================================================================
 // MAIN HANDLER
 // ============================================================================
 
@@ -180,20 +128,22 @@ serve(async (req) => {
   }
 
   // Parse request body
-  let body: DocumentRequest;
+  let body: { request_id?: string; access_token?: string };
   try {
     body = await req.json();
   } catch {
     return json({ error: "Invalid JSON body" }, 400);
   }
 
-  // Validate request
-  const validation = validateRequest(body);
-  if (!validation.valid) {
-    return json({ error: validation.error }, 400);
+  const { request_id, access_token } = body;
+
+  if (!request_id) {
+    return json({ error: "request_id is required" }, 400);
   }
 
-  const { fullName, email, company, documents, ndaAgreed } = validation.data;
+  if (!access_token) {
+    return json({ error: "access_token is required" }, 400);
+  }
 
   // Initialize Supabase client with service role
   const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY, {
@@ -201,60 +151,124 @@ serve(async (req) => {
   });
 
   try {
-    // Create document request record (pending verification)
-    const { data: requestRow, error: insertError } = await supabase
-      .from("document_requests")
-      .insert({
-        full_name: fullName,
-        email,
-        company,
-        documents,
-        nda_agreed: ndaAgreed,
-        status: "pending_verification",
-      })
-      .select("id")
-      .single();
-
-    if (insertError) {
-      console.error("Insert error:", insertError);
-      return json({ error: "Failed to create document request" }, 500);
+    // Verify the access token
+    const { data: userData, error: authError } = await supabase.auth.getUser(access_token);
+    
+    if (authError || !userData?.user) {
+      return json({ error: "Invalid or expired access token" }, 401);
     }
 
-    const requestId = requestRow.id;
+    const userEmail = userData.user.email;
 
-    // Send magic link email using Supabase Auth
-    const redirectUrl = SITE_BASE_URL 
-      ? `https://${SITE_BASE_URL}/verify.html?request_id=${requestId}`
-      : `${SUPABASE_URL}/verify.html?request_id=${requestId}`;
+    // Fetch the document request
+    const { data: requestData, error: fetchError } = await supabase
+      .from("document_requests")
+      .select("*")
+      .eq("id", request_id)
+      .single();
 
-    const { error: otpError } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          request_id: requestId,
-          company: company,
-          documents: documents,
-        },
-      },
-    });
+    if (fetchError || !requestData) {
+      return json({ error: "Document request not found" }, 404);
+    }
 
-    if (otpError) {
-      console.error("OTP error:", otpError);
-      // Still return success - request was created, just email failed
-      // User can be notified to check spam or contact support
+    // Verify email matches
+    if (requestData.email !== userEmail) {
+      return json({ error: "Email mismatch - unauthorized" }, 403);
+    }
+
+    // Check if already verified and has links
+    if (requestData.status === "verified" && requestData.links) {
       return json({
         success: true,
-        message: "Request created. Please check your email (including spam folder) for the verification link.",
-        request_id: requestId,
+        message: "Documents already generated",
+        links: requestData.links,
       });
+    }
+
+    // Generate watermarked PDFs and signed URLs
+    const company = requestData.company;
+    const documents = requestData.documents || [];
+    const sanitizedCompany = sanitizeCompanyName(company);
+    const timestamp = Date.now();
+    const links: Array<{ key: string; label: string; url: string }> = [];
+
+    for (const docKey of documents) {
+      const config = DOC_CONFIG[docKey];
+      if (!config) continue;
+
+      // Download original PDF
+      const { data: fileData, error: downloadError } = await supabase
+        .storage
+        .from(STORAGE_BUCKET)
+        .download(config.fileName);
+
+      if (downloadError || !fileData) {
+        console.error(`Failed to download ${config.fileName}:`, downloadError);
+        continue;
+      }
+
+      // Apply watermark
+      const originalBytes = new Uint8Array(await fileData.arrayBuffer());
+      const watermarkedBytes = await watermarkPdf(originalBytes, company);
+
+      // Upload watermarked PDF
+      const watermarkedPath = `watermarked/${sanitizedCompany}/${timestamp}_${config.fileName}`;
+      const { error: uploadError } = await supabase
+        .storage
+        .from(STORAGE_BUCKET)
+        .upload(watermarkedPath, watermarkedBytes, {
+          contentType: 'application/pdf',
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error(`Failed to upload watermarked ${config.fileName}:`, uploadError);
+        continue;
+      }
+
+      // Generate signed URL for watermarked PDF
+      const { data: signedData, error: signError } = await supabase
+        .storage
+        .from(STORAGE_BUCKET)
+        .createSignedUrl(watermarkedPath, LINK_TTL_SECONDS);
+
+      if (signError || !signedData?.signedUrl) {
+        console.error(`Failed to create signed URL for ${config.fileName}:`, signError);
+        continue;
+      }
+
+      links.push({
+        key: docKey,
+        label: config.label,
+        url: signedData.signedUrl,
+      });
+    }
+
+    if (links.length === 0) {
+      return json({ error: "Failed to generate any document links" }, 500);
+    }
+
+    // Update request with links and verified status
+    const { error: updateError } = await supabase
+      .from("document_requests")
+      .update({
+        status: "verified",
+        verified_at: new Date().toISOString(),
+        auth_user_id: userData.user.id,
+        links: links,
+      })
+      .eq("id", request_id);
+
+    if (updateError) {
+      console.error("Failed to update request:", updateError);
+      // Still return links even if update fails
     }
 
     return json({
       success: true,
-      message: "Please check your email to verify and access your documents.",
-      request_id: requestId,
-      documents_requested: documents.map(d => DOC_CONFIG[d]?.label || d),
+      message: "Documents verified and ready for download",
+      company: company,
+      links: links,
     });
 
   } catch (err) {

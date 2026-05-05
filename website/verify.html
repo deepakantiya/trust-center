@@ -1,81 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verify Email - Trust Center</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify & Download Documents - Trust Center</title>
+  <link rel="stylesheet" href="css/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    :root { --primary: #667eea; --success: #10b981; --error: #ef4444; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', -apple-system, sans-serif; background: #f9fafb; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .container { max-width: 500px; width: 100%; }
-    .card { background: white; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); overflow: hidden; }
-    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; }
-    .header h1 { color: white; font-size: 24px; }
-    .content { padding: 30px; }
-    .loading { text-align: center; padding: 40px; }
-    .spinner { width: 48px; height: 48px; border: 4px solid #e5e7eb; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .error-message, .success { text-align: center; }
-    .doc-link { display: block; padding: 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; text-decoration: none; color: #1f2937; margin-bottom: 12px; }
-    .doc-link:hover { border-color: var(--primary); }
-    .btn { display: inline-block; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; text-decoration: none; cursor: pointer; }
+    .verify-container {
+      max-width: 600px;
+      margin: 80px auto;
+      padding: 40px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    .verify-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #1a1a2e;
+    }
+    .verify-message {
+      color: #666;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #666;
+    }
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #e0e0e0;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 16px;
+      color: #dc2626;
+    }
+    .success-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 16px;
+      color: #16a34a;
+      margin-bottom: 24px;
+    }
+    .download-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .download-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .download-item:last-child {
+      margin-bottom: 0;
+    }
+    .doc-label {
+      font-weight: 500;
+      color: #1a1a2e;
+    }
+    .download-btn {
+      background: #3b82f6;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .download-btn:hover {
+      background: #2563eb;
+    }
+    .watermark-notice {
+      margin-top: 24px;
+      padding: 16px;
+      background: #fefce8;
+      border: 1px solid #fef08a;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #854d0e;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <div class="header"><h1>🔐 Trust Center</h1></div>
-      <div class="content">
-        <div id="loading" class="loading"><div class="spinner"></div><p>Verifying your email...</p></div>
-        <div id="error" class="error-message" style="display:none;"><h2 style="color:var(--error)">❌ Verification Failed</h2><p id="error-text"></p><a href="/" class="btn" style="margin-top:20px">Request New Documents</a></div>
-        <div id="success" style="display:none;"><h2 style="color:var(--success)">✅ Email Verified!</h2><p>Hello <strong id="user-name"></strong></p><div id="doc-list" style="margin-top:20px;"></div></div>
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <a href="index.html" class="logo">[Company] Trust Center</a>
+        <nav>
+          <a href="security.html">Security</a>
+          <a href="index.html#request">Request Docs</a>
+        </nav>
       </div>
     </div>
-  </div>
-  <script>
-    const SUPABASE_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWdmbXFybHhoaW9sbGRlY3hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDEwOTAsImV4cCI6MjA5MzE3NzA5MH0.G58GAn9_jA0nKylGGo1NogF1Gitbtj9hta-O6Zs4OHc'; // Update this
-    const STORAGE_BUCKET = 'audit-docs';
-    const DOC_LABELS = { soc2: 'SOC 2 Report', iso27001: 'ISO 27001', pentest: 'Pentest Report', cmmc: 'CMMC', dpa: 'DPA', questionnaire: 'Security Questionnaire' };
-    const DOC_PATHS = { soc2: 'soc2.pdf', iso27001: 'iso27001.pdf', pentest: 'pentest.pdf', cmmc: 'cmmc.pdf', dpa: 'dpa.pdf', questionnaire: 'questionnaire.pdf' };
+  </header>
 
-    async function verify() {
-      const loading = document.getElementById('loading');
-      const error = document.getElementById('error');
-      const success = document.getElementById('success');
+  <main>
+    <div class="verify-container" id="verifyContainer">
+      <div class="loading" id="loadingState">
+        <div class="spinner"></div>
+        <span>Verifying your email and generating documents...</span>
+      </div>
+      
+      <div id="errorState" style="display: none;">
+        <h1 class="verify-title">Verification Failed</h1>
+        <div class="error-box">
+          <p id="errorMessage">An error occurred during verification.</p>
+        </div>
+        <p class="verify-message" style="margin-top: 20px;">
+          <a href="index.html">Return to homepage</a> to request documents again.
+        </p>
+      </div>
+      
+      <div id="successState" style="display: none;">
+        <h1 class="verify-title">✓ Email Verified</h1>
+        <div class="success-box">
+          <p>Your documents are ready for download.</p>
+        </div>
+        <p class="verify-message">Prepared for: <strong id="companyName"></strong></p>
+        
+        <ul class="download-list" id="downloadList"></ul>
+        
+        <div class="watermark-notice">
+          <strong>📋 Note:</strong> These documents are watermarked with your company name 
+          and are prepared exclusively for your organization. Download links expire in 7 days.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <span>© <span id="year"></span> [Company Name].</span>
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+    </div>
+  </footer>
+
+  <script>
+    // Configuration - UPDATE THESE VALUES
+    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+    const VERIFY_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/verify-documents`;
+
+    // Set current year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Initialize Supabase client
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // DOM elements
+    const loadingState = document.getElementById('loadingState');
+    const errorState = document.getElementById('errorState');
+    const successState = document.getElementById('successState');
+    const errorMessage = document.getElementById('errorMessage');
+    const companyName = document.getElementById('companyName');
+    const downloadList = document.getElementById('downloadList');
+
+    function showError(message) {
+      loadingState.style.display = 'none';
+      errorMessage.textContent = message;
+      errorState.style.display = 'block';
+    }
+
+    function showSuccess(company, links) {
+      loadingState.style.display = 'none';
+      companyName.textContent = company;
+      
+      downloadList.innerHTML = links.map(link => `
+        <li class="download-item">
+          <span class="doc-label">📄 ${link.label}</span>
+          <a href="${link.url}" class="download-btn" target="_blank" rel="noopener">Download</a>
+        </li>
+      `).join('');
+      
+      successState.style.display = 'block';
+    }
+
+    async function verifyAndGenerateDocuments() {
       try {
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const hash = new URLSearchParams(window.location.hash.substring(1));
-        if (hash.get('access_token')) {
-          await supabase.auth.setSession({ access_token: hash.get('access_token'), refresh_token: hash.get('refresh_token') });
-          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        // Get request_id from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestId = urlParams.get('request_id');
+
+        if (!requestId) {
+          showError('Missing request ID. Please use the link from your verification email.');
+          return;
         }
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) throw new Error('No session. Use the link from your email.');
-        const requestId = new URLSearchParams(window.location.search).get('request_id');
-        const { data: request } = await supabase.from('document_requests').select('*').eq('id', requestId).eq('email', session.user.email.toLowerCase()).single();
-        if (!request) throw new Error('Request not found.');
-        const links = [];
-        for (const doc of (request.docs || [])) {
-          if (DOC_PATHS[doc]) {
-            const { data } = await supabase.storage.from(STORAGE_BUCKET).createSignedUrl(DOC_PATHS[doc], 7*24*60*60);
-            if (data) links.push({ label: DOC_LABELS[doc], url: data.signedUrl });
+
+        // Check for existing session (Supabase puts tokens in URL hash after magic link)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+
+        // If tokens in URL, set the session
+        if (accessToken && refreshToken) {
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          
+          if (sessionError) {
+            console.error('Session error:', sessionError);
+            showError('Failed to verify your session. The link may have expired.');
+            return;
           }
+          
+          // Clean up URL
+          window.history.replaceState({}, document.title, window.location.pathname + '?request_id=' + requestId);
         }
-        await supabase.from('document_requests').update({ status: 'completed', verified_at: new Date().toISOString(), auth_user_id: session.user.id, links }).eq('id', request.id);
-        loading.style.display = 'none';
-        success.style.display = 'block';
-        document.getElementById('user-name').textContent = request.name;
-        document.getElementById('doc-list').innerHTML = links.map(l => `<a href="${l.url}" class="doc-link" target="_blank">📄 ${l.label}</a>`).join('');
-      } catch (e) {
-        loading.style.display = 'none';
-        error.style.display = 'block';
-        document.getElementById('error-text').textContent = e.message;
+
+        // Get current session
+        const { data: { session }, error: getSessionError } = await supabase.auth.getSession();
+
+        if (getSessionError || !session) {
+          showError('No valid session found. Please use the verification link from your email.');
+          return;
+        }
+
+        // Call verify-documents function
+        const response = await fetch(VERIFY_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            request_id: requestId,
+            access_token: session.access_token,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          showError(result.error || 'Failed to generate documents. Please try again.');
+          return;
+        }
+
+        showSuccess(result.company, result.links);
+
+      } catch (err) {
+        console.error('Verification error:', err);
+        showError('An unexpected error occurred. Please try again later.');
       }
     }
-    verify();
+
+    // Run verification on page load
+    verifyAndGenerateDocuments();
   </script>
 </body>
 </html>
