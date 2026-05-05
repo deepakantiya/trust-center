@@ -69,11 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          full_name: fullName,
+          fullName: fullName,
           email: email,
-          company: company,
+          companyName: company,
           documents: documents,
-          nda_agreed: ndaAgreed,
+          ndaAccepted: ndaAgreed,
         }),
       });
 

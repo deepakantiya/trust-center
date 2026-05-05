@@ -8,7 +8,7 @@ export default function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store, max-age=0');
 
   const env = {
-    EDGE_FUNCTION_URL:       process.env.EDGE_FUNCTION_URL       ?? '',
+    EDGE_FUNCTION_URL:        process.env.EDGE_FUNCTION_URL        ?? '',
     SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY ?? '',
   };
 

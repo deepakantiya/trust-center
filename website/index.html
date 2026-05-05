@@ -1114,85 +1114,68 @@
             if (statusDiv) statusDiv.style.display = 'none';
         }
 
-        // Show success page with download links
+        // Escape HTML to prevent injection
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/[&<>"']/g, c =>
+                ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+        }
+
+        // Show success page with download links (each URL valid for 7 days)
         function showSuccessPage(result) {
-            // Hide just the form, not the container (so success div remains visible)
-            const form = document.getElementById('document-request-form');
-            if (form) {
-                form.style.display = 'none';
-            }
-            
-            // Get or create success container
-            let successDiv = document.getElementById('request-success');
-            if (!successDiv) {
-                const formContainer = document.getElementById('request-form-container');
-                successDiv = document.createElement('div');
-                successDiv.id = 'request-success';
-                if (formContainer) {
-                    formContainer.appendChild(successDiv);
-                }
-            }
-            
+            // Hide the form container entirely — success div replaces it
+            const formContainer = document.getElementById('request-form-container');
+            if (formContainer) formContainer.style.display = 'none';
+
+            const downloadContainer = document.getElementById('download-container');
+            const successDiv = document.getElementById('request-success');
+
             const expiresDate = new Date(result.expiresAt).toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
             });
-            
-            let documentsHtml = result.documents.map(doc => `
-                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <span style="font-size: 32px;">${doc.icon}</span>
-                            <div>
-                                <h4 style="margin: 0; font-weight: 600; color: #111827;">${doc.name}</h4>
-                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #6b7280;">Click to download PDF</p>
-                            </div>
-                        </div>
-                        <a href="${doc.url}" target="_blank" 
-                           style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 8px;">
-                            📥 Download PDF
-                        </a>
-                    </div>
-                    <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
-                        <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">Direct Link (valid for 7 days):</label>
-                        <input type="text" value="${doc.url}" readonly 
-                               onclick="this.select(); document.execCommand('copy'); this.style.borderColor='#22c55e';"
-                               style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 12px; color: #374151; background: #f9fafb; cursor: pointer;"
-                               title="Click to copy">
-                    </div>
+
+            const cardsHtml = (result.documents || []).map(doc => `
+                <div class="download-card">
+                    <span class="doc-icon">${escapeHtml(doc.icon)}</span>
+                    <h4>${escapeHtml(doc.name)}</h4>
+                    <p>PDF · Watermarked · Confidential</p>
+                    <a class="btn-download" href="${escapeHtml(doc.url)}" target="_blank" rel="noopener noreferrer">
+                        📥 Download
+                    </a>
+                </div>`).join('');
+
+            const successHtml = `
+                <div class="success-header">
+                    <span class="success-icon">✅</span>
+                    <h3>Your documents are ready</h3>
+                    <p>Prepared for <strong>${escapeHtml(result.name || '')}</strong> · <strong>${escapeHtml(result.company || '')}</strong></p>
                 </div>
-            `).join('');
-            
-            successDiv.innerHTML = `
-                <div style="max-width: 800px; margin: 0 auto; padding: 40px 20px;">
-                    <div style="text-align: center; margin-bottom: 32px;">
-                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                            <span style="font-size: 40px;">✅</span>
-                        </div>
-                        <h2 style="margin: 0 0 8px 0; font-size: 28px; color: #111827;">Request Approved!</h2>
-                        <p style="margin: 0; color: #6b7280; font-size: 16px;">Your compliance documents are ready for download.</p>
-                    </div>
-                    
-                    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px 20px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
-                        <p style="margin: 0; color: #92400e; font-size: 14px;">
-                            <strong>⏰ Important:</strong> These links expire on <strong>${expiresDate}</strong>. Please download your documents before then.
-                        </p>
-                    </div>
-                    
-                    <h3 style="margin: 0 0 16px 0; font-size: 18px; color: #374151;">📄 Your Documents</h3>
-                    ${documentsHtml}
-                    
-                    <div style="text-align: center; margin-top: 32px;">
-                        <button onclick="location.reload()" 
-                                style="background: #f3f4f6; color: #374151; padding: 12px 24px; border: 1px solid #d1d5db; border-radius: 8px; cursor: pointer; font-weight: 500;">
-                            ← Request Additional Documents
-                        </button>
-                    </div>
+
+                <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 14px 18px;
+                            border-radius: 0 8px 8px 0; margin: 0 auto 28px; max-width: 720px; text-align: left;">
+                    <p style="margin: 0; color: #92400e; font-size: 14px;">
+                        <strong>⏰ Links expire on ${escapeHtml(expiresDate)}.</strong>
+                        Save your downloads before then — these URLs are valid for 7 days.
+                    </p>
                 </div>
+
+                <div class="download-grid">${cardsHtml}</div>
+
+                <div class="download-note">
+                    <p>🔒 These documents are governed by the NDA you accepted.</p>
+                    <p>Do not share links or distribute files outside <strong>${escapeHtml(result.company || 'your organisation')}</strong>.</p>
+                </div>
+
+                <button class="btn btn-secondary" onclick="location.reload()">← Request additional documents</button>
             `;
-            successDiv.style.display = 'block';
+
+            // Prefer the pre-existing download-container; fall back to the inline success div
+            if (downloadContainer) {
+                downloadContainer.innerHTML = successHtml;
+                downloadContainer.style.display = 'block';
+            } else if (successDiv) {
+                successDiv.innerHTML = `<div class="download-container">${successHtml}</div>`;
+                successDiv.style.display = 'block';
+            }
         }
 
         // Main form submit handler
@@ -1204,8 +1187,8 @@
             const submitBtn = form.querySelector('button[type="submit"]');
             const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
             
-            // Get checkbox - try multiple possible IDs
-            const ndaCheckbox = document.getElementById('acceptNDA') || document.getElementById('nda-checkbox') || form.querySelector('input[type="checkbox"]');
+            // NDA checkbox — must be checked to proceed
+            const ndaCheckbox = document.getElementById('ndaAgreed');
             if (!ndaCheckbox || !ndaCheckbox.checked) {
                 showStatus('Please accept the Non-Disclosure Agreement to continue.', 'error');
                 return;
@@ -1222,10 +1205,9 @@
                 return;
             }
             
-            // Get form values - try multiple possible IDs
-            const fullName = (document.getElementById('full-name') || document.getElementById('fullName') || form.querySelector('input[name="fullName"]'))?.value || '';
-            const email = (document.getElementById('email') || form.querySelector('input[name="email"]'))?.value || '';
-            const companyName = (document.getElementById('company-name') || document.getElementById('companyName') || form.querySelector('input[name="company"]'))?.value || '';
+            const fullName    = document.getElementById('fullName')?.value?.trim() || '';
+            const email       = document.getElementById('email')?.value?.trim() || '';
+            const companyName = document.getElementById('company')?.value?.trim() || '';
             
             if (!fullName || !email || !companyName) {
                 showStatus('Please fill in all required fields.', 'error');
@@ -1262,7 +1244,11 @@
                 
                 if (result.success) {
                     hideStatus();
+                    // Show inline download links — each URL is valid for 7 days
                     showSuccessPage(result);
+                    // Smoothly scroll the success view into focus
+                    const successDiv = document.getElementById('request-success');
+                    if (successDiv) successDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 } else {
                     showStatus(result.error || 'An error occurred. Please try again.', 'error');
                     if (submitBtn) {
@@ -1296,7 +1282,7 @@
         }
 
         function acceptNDA() {
-            const checkbox = document.getElementById('acceptNDA') || document.getElementById('nda-checkbox');
+            const checkbox = document.getElementById('ndaAgreed');
             if (checkbox) {
                 checkbox.checked = true;
             }

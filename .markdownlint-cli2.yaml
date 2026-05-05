@@ -30,3 +30,15 @@ config:
 
   # MD060 - Table column style: varies across imported compliance templates
   MD060: false
+
+  # MD034 - Bare URLs: deployment docs reference dashboards/status pages directly
+  MD034: false
+
+  # MD040 - Fenced code language: tag-less blocks are common for shell output / mixed content
+  MD040: false
+
+  # MD051 - Link fragments: emoji-prefixed headings break auto-anchors in some docs
+  MD051: false
+
+  # MD026 - Trailing punctuation in heading: some sub-headings end with ":" or "?"
+  MD026: false
