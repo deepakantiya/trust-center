@@ -1,10 +1,75 @@
+// supabase/functions/request-documents/index.ts
+// Consolidated Edge Function with Magic Link authentication + PDF Watermarking
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { PDFDocument, rgb, StandardFonts, degrees } from "https://esm.sh/pdf-lib@1.17.1"
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SECRET_KEY = 
+  Deno.env.get("SUPABASE_SECRET_KEY") ?? 
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+// Public base URL of the Vercel frontend
+const RAW_SITE_URL = Deno.env.get("SITE_BASE_URL") ?? "";
+// Normalize: strip protocol and trailing slashes for clean URL construction
+const SITE_BASE_URL = RAW_SITE_URL
+  .replace(/^https?:\/\//i, "")
+  .replace(/\/+$/, "");
+
+const STORAGE_BUCKET = "audit-docs";
+const LINK_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days
+
+// ============================================================================
+// DOCUMENT CONFIGURATION
+// ============================================================================
+
+interface DocConfig {
+  label: string;
+  fileName: string;
+}
+
+const DOC_CONFIG: Record<string, DocConfig> = {
+  soc2: { label: "SOC 2 Type II Report", fileName: "soc2.pdf" },
+  iso27001: { label: "ISO 27001 Statement of Applicability", fileName: "iso27001.pdf" },
+  cmmc: { label: "CMMC Assessment Summary (L1 / L2)", fileName: "cmmc.pdf" },
+  pentest: { label: "Penetration Test Executive Summary", fileName: "pentest.pdf" },
+  dpa: { label: "Data Processing Agreement", fileName: "dpa.pdf" },
+  questionnaire: { label: "Security Questionnaire", fileName: "questionnaire.pdf" },
+};
+
+// ============================================================================
+// CORS HEADERS
+// ============================================================================
+
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+  });
+}
+
+// Sanitize company name for use in file paths
+function sanitizeCompanyName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_|_$/g, '')
+    .substring(0, 50);
 }
 
 // Apply watermark to PDF
@@ -55,232 +120,145 @@ async function watermarkPdf(pdfBytes: Uint8Array, companyName: string): Promise<
   return await pdfDoc.save();
 }
 
-serve(async (req) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+// ============================================================================
+// REQUEST VALIDATION
+// ============================================================================
+
+interface DocumentRequest {
+  fullName?: string;
+  full_name?: string;
+  email?: string;
+  company?: string;
+  documents?: string[];
+  ndaAgreed?: boolean;
+  nda_agreed?: boolean;
+}
+
+function validateRequest(body: DocumentRequest): { valid: true; data: { fullName: string; email: string; company: string; documents: string[]; ndaAgreed: boolean } } | { valid: false; error: string } {
+  // Accept both camelCase and snake_case
+  const fullName = body.fullName ?? body.full_name;
+  const ndaAgreed = body.ndaAgreed ?? body.nda_agreed;
+  const { email, company, documents } = body;
+
+  if (!fullName || typeof fullName !== "string") {
+    return { valid: false, error: "Full name is required" };
+  }
+  if (!email || typeof email !== "string" || !email.includes("@")) {
+    return { valid: false, error: "Valid email is required" };
+  }
+  if (!company || typeof company !== "string") {
+    return { valid: false, error: "Company name is required" };
+  }
+  if (!Array.isArray(documents) || documents.length === 0) {
+    return { valid: false, error: "At least one document must be selected" };
+  }
+  if (ndaAgreed !== true) {
+    return { valid: false, error: "NDA must be agreed to" };
   }
 
+  // Filter to valid document keys
+  const validDocs = documents.filter((d) => typeof d === "string" && DOC_CONFIG[d]);
+  if (validDocs.length === 0) {
+    return { valid: false, error: "No valid documents selected" };
+  }
+
+  return { valid: true, data: { fullName, email, company, documents: validDocs, ndaAgreed } };
+}
+
+// ============================================================================
+// MAIN HANDLER
+// ============================================================================
+
+serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: CORS_HEADERS });
+  }
+
+  if (req.method !== "POST") {
+    return json({ error: "Method not allowed" }, 405);
+  }
+
+  // Parse request body
+  let body: DocumentRequest;
   try {
-    // Check for empty body first
-    const contentLength = req.headers.get('content-length');
-    if (req.method === 'POST' && (!contentLength || contentLength === '0')) {
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Request body is empty. Please provide form data.' 
-      }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+    body = await req.json();
+  } catch {
+    return json({ error: "Invalid JSON body" }, 400);
+  }
 
-    // Handle non-POST methods
-    if (req.method !== 'POST') {
-      return new Response(JSON.stringify({ 
-        success: false,
-        error: 'Method not allowed. Use POST.' 
-      }), {
-        status: 405,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+  // Validate request
+  const validation = validateRequest(body);
+  if (!validation.valid) {
+    return json({ error: validation.error }, 400);
+  }
 
-    // Parse JSON body with error handling
-    let body;
-    try {
-      const text = await req.text();
-      console.log('Received request body:', text);
-      body = JSON.parse(text);
-    } catch (parseError) {
-      console.error('JSON parse error:', parseError);
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Invalid JSON in request body. Please check your request format.' 
-      }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+  const { fullName, email, company, documents, ndaAgreed } = validation.data;
 
-    const { fullName, email, companyName, documents, ndaAccepted } = body;
+  // Initialize Supabase client with service role
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SECRET_KEY, {
+    auth: { persistSession: false },
+  });
 
-    // Validation
-    const missingFields = [];
-    if (!fullName) missingFields.push('fullName');
-    if (!email) missingFields.push('email');
-    if (!companyName) missingFields.push('companyName');
-    if (!documents || !documents.length) missingFields.push('documents');
-    if (!ndaAccepted) missingFields.push('ndaAccepted');
-
-    if (missingFields.length > 0) {
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: `Missing required fields: ${missingFields.join(', ')}` 
-      }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Check for Supabase environment variables
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
-    if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('Missing Supabase environment variables');
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Server configuration error. Please contact support.' 
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Insert request record
-    const { data: requestRecord, error: insertError } = await supabase
-      .from('document_requests')
+  try {
+    // Create document request record (pending verification)
+    const { data: requestRow, error: insertError } = await supabase
+      .from("document_requests")
       .insert({
         full_name: fullName,
-        email: email,
-        company_name: companyName,
-        nda_accepted: true,
-        nda_accepted_at: new Date().toISOString(),
-        documents_requested: documents
+        email,
+        company,
+        documents,
+        nda_agreed: ndaAgreed,
+        status: "pending_verification",
       })
-      .select()
+      .select("id")
       .single();
 
     if (insertError) {
-      console.error('Database insert error:', insertError);
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Failed to save your request. Please try again.' 
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      console.error("Insert error:", insertError);
+      return json({ error: "Failed to create document request" }, 500);
+    }
+
+    const requestId = requestRow.id;
+
+    // Send magic link email using Supabase Auth
+    const redirectUrl = SITE_BASE_URL 
+      ? `https://${SITE_BASE_URL}/verify.html?request_id=${requestId}`
+      : `${SUPABASE_URL}/verify.html?request_id=${requestId}`;
+
+    const { error: otpError } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          request_id: requestId,
+          company: company,
+          documents: documents,
+        },
+      },
+    });
+
+    if (otpError) {
+      console.error("OTP error:", otpError);
+      // Still return success - request was created, just email failed
+      // User can be notified to check spam or contact support
+      return json({
+        success: true,
+        message: "Request created. Please check your email (including spam folder) for the verification link.",
+        request_id: requestId,
       });
     }
 
-    // Document mapping
-    const documentPaths: Record<string, { name: string, path: string, icon: string }> = {
-      soc2: { name: 'SOC 2 Type II Report', path: 'soc2.pdf', icon: '🔒' },
-      iso27001: { name: 'ISO 27001 Certificate', path: 'iso27001.pdf', icon: '📋' },
-      pentest: { name: 'Penetration Test Summary', path: 'pentest.pdf', icon: '🔍' },
-      cmmc: { name: 'CMMC Assessment', path: 'cmmc.pdf', icon: '🛡️' },
-      dpa: { name: 'Data Processing Agreement', path: 'dpa.pdf', icon: '📜' },
-      questionnaire: { name: 'Security Questionnaire', path: 'questionnaire.pdf', icon: '📝' }
-    };
-
-    // Generate signed URLs (7 days expiry)
-    const expiresIn = 7 * 24 * 60 * 60; // 604800 seconds
-    const expiresAt = new Date(Date.now() + expiresIn * 1000);
-    const generatedUrls = [];
-    
-    // Sanitize company name for filename
-    const safeCompanyName = companyName.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-    const timestamp = Date.now();
-
-    for (const docKey of documents) {
-      const doc = documentPaths[docKey];
-      if (!doc) continue;
-
-      try {
-        // 1. Download the original PDF from storage
-        const { data: originalPdf, error: downloadError } = await supabase
-          .storage
-          .from('audit-docs')
-          .download(doc.path);
-
-        if (downloadError || !originalPdf) {
-          console.error(`Failed to download ${doc.path}:`, downloadError);
-          continue;
-        }
-
-        // 2. Apply watermark
-        const pdfBytes = new Uint8Array(await originalPdf.arrayBuffer());
-        const watermarkedPdf = await watermarkPdf(pdfBytes, companyName);
-
-        // 3. Upload watermarked PDF to temporary folder
-        const watermarkedPath = `watermarked/${safeCompanyName}/${timestamp}_${doc.path}`;
-        
-        const { error: uploadError } = await supabase
-          .storage
-          .from('audit-docs')
-          .upload(watermarkedPath, watermarkedPdf, {
-            contentType: 'application/pdf',
-            upsert: true
-          });
-
-        if (uploadError) {
-          console.error(`Failed to upload watermarked ${doc.path}:`, uploadError);
-          continue;
-        }
-
-        // 4. Generate signed URL for the watermarked PDF
-        const { data: signedUrlData, error: signedUrlError } = await supabase
-          .storage
-          .from('audit-docs')
-          .createSignedUrl(watermarkedPath, expiresIn);
-
-        if (signedUrlError || !signedUrlData?.signedUrl) {
-          console.error(`Failed to create signed URL for ${watermarkedPath}:`, signedUrlError);
-          continue;
-        }
-
-        // 5. Store download record
-        await supabase.from('document_downloads').insert({
-          request_id: requestRecord.id,
-          document_type: docKey,
-          storage_path: watermarkedPath,
-          signed_url: signedUrlData.signedUrl,
-          expires_at: expiresAt.toISOString()
-        });
-
-        generatedUrls.push({
-          key: docKey,
-          name: doc.name,
-          icon: doc.icon,
-          url: signedUrlData.signedUrl
-        });
-        
-      } catch (docError) {
-        console.error(`Error processing ${docKey}:`, docError);
-        continue;
-      }
-    }
-
-    if (generatedUrls.length === 0) {
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: 'Failed to generate document links. Please try again.' 
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    return new Response(JSON.stringify({
+    return json({
       success: true,
-      message: 'Your request has been approved! Personalized documents are ready for download.',
-      requestId: requestRecord.id,
-      documents: generatedUrls,
-      expiresAt: expiresAt.toISOString()
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      message: "Please check your email to verify and access your documents.",
+      request_id: requestId,
+      documents_requested: documents.map(d => DOC_CONFIG[d]?.label || d),
     });
 
-  } catch (error) {
-    console.error('Unexpected error:', error);
-    return new Response(JSON.stringify({ 
-      success: false, 
-      error: 'An unexpected error occurred. Please try again.' 
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    return json({ error: "Internal server error" }, 500);
   }
-})
+});
