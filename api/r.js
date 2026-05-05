@@ -3,19 +3,25 @@
 import { createClient } from "@supabase/supabase-js";
 
 const SUPABASE_URL = process.env.SUPABASE_URL ?? "";
+const TRUSTED_HOSTNAME = SUPABASE_URL ? new URL(SUPABASE_URL).hostname : null;
+const CODE_REGEX = /^[a-z0-9]{8}$/;
+
+let supabaseClient = null;
+function getSupabaseClient() {
+  if (!supabaseClient) {
+    supabaseClient = createClient(SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
+  }
+  return supabaseClient;
+}
 
 // Only redirect to Supabase Storage signed URLs — prevents open redirect abuse.
-// Checks HTTPS + *.supabase.co hostname + signed-URL path prefix, falling back
-// to an exact hostname match when SUPABASE_URL is configured.
+// Checks HTTPS + *.supabase.co hostname + signed-URL path prefix.
 function isTrustedUrl(url) {
   try {
     const parsed = new URL(url);
     if (parsed.protocol !== "https:") return false;
     if (!parsed.pathname.startsWith("/storage/v1/object/sign/")) return false;
-    if (SUPABASE_URL) {
-      return parsed.hostname === new URL(SUPABASE_URL).hostname;
-    }
-    return parsed.hostname.endsWith(".supabase.co");
+    return TRUSTED_HOSTNAME ? parsed.hostname === TRUSTED_HOSTNAME : parsed.hostname.endsWith(".supabase.co");
   } catch {
     return false;
   }
@@ -24,11 +30,11 @@ function isTrustedUrl(url) {
 export default async function handler(req, res) {
   const code = req.query.code;
 
-  if (!code || !/^[a-z0-9]{8}$/.test(code)) {
+  if (!code || !CODE_REGEX.test(code)) {
     return res.status(400).send("Invalid link.");
   }
 
-  const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
+  const supabase = getSupabaseClient();
 
   const { data, error } = await supabase
     .from("short_urls")

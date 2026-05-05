@@ -1,6 +1,6 @@
 // api/d/[requestId]/[docKey].js
 // Vercel serverless function - Short URL redirect handler for Trust Center document downloads
-// 
+//
 // Short URL format: /api/d/{requestId}/{docKey}
 // Example: /api/d/abc123-uuid/soc2 → redirects to the actual Supabase signed URL
 //
@@ -10,6 +10,16 @@ import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const VALID_DOC_KEYS = new Set(['soc2', 'iso27001', 'cmmc', 'pentest', 'dpa', 'questionnaire']);
+
+let supabaseClient = null;
+function getSupabaseClient() {
+  if (!supabaseClient) {
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  }
+  return supabaseClient;
+}
 
 export default async function handler(req, res) {
   // Only allow GET requests
@@ -24,20 +34,18 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing requestId or docKey' });
   }
 
-  // Validate UUID format for requestId (basic check)
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  if (!uuidRegex.test(requestId)) {
+  // Validate UUID format for requestId
+  if (!UUID_REGEX.test(requestId)) {
     return res.status(400).json({ error: 'Invalid request ID format' });
   }
 
   // Validate docKey against known document types
-  const validDocKeys = ['soc2', 'iso27001', 'cmmc', 'pentest', 'dpa', 'questionnaire'];
-  if (!validDocKeys.includes(docKey)) {
+  if (!VALID_DOC_KEYS.has(docKey)) {
     return res.status(400).json({ error: 'Invalid document key' });
   }
 
   try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const supabase = getSupabaseClient();
 
     // Fetch the document request and its links
     const { data: request, error: dbError } = await supabase
