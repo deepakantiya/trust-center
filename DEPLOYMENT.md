@@ -54,8 +54,10 @@ supabase secrets list
 ## Step 3 — Deploy the Edge Function
 
 ```bash
-supabase functions deploy request-documents --no-verify-jwt
+supabase functions deploy request-documents
 ```
+
+**Note:** Do NOT use `--no-verify-jwt`. The Supabase gateway validates the apikey header; removing this flag allows proper authentication.
 
 Test it:
 ```bash
