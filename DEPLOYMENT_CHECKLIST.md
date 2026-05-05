@@ -101,7 +101,7 @@ curl -X POST "https://YOUR_PROJECT_REF.supabase.co/functions/v1/Deno-Edge-Functi
 
 ## Phase 3: Vercel Setup (15 min)
 
-### Create Project
+### Create Vercel Project
 - [ ] Go to https://vercel.com
 - [ ] Click "Add New → Project"
 - [ ] Select `trust-center` repository from GitHub
@@ -299,4 +299,3 @@ If something breaks, here's how to rollback:
 - **Your Vercel URL**: https://your-project.vercel.app
 - **Your Edge Function**: https://YOUR_PROJECT_REF.supabase.co/functions/v1/Deno-Edge-Function
 - **GitHub Repository**: https://github.com/YOUR_ORG/trust-center
-
