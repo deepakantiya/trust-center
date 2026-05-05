@@ -30,7 +30,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Set target URL
         id: set-url
@@ -70,7 +70,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.15.0
