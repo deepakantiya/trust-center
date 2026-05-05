@@ -1059,11 +1059,11 @@
   </div>
 
   <footer class="site-footer">
-    <div class="container">
-      <p>&copy; 2024 [Company Name]. All rights reserved.</p>
+    <div class="container footer-inner">
+      <span>© <span id="year"></span> [Company Name].</span>
       <nav>
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
         <a href="security.html">Security</a>
         <a href="subprocessors.html">Subprocessors</a>
       </nav>
@@ -1320,5 +1320,9 @@
         });
     </script>
 
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
