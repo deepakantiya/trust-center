@@ -950,7 +950,7 @@
             <label for="companyName">
               <span class="label-icon">🏢</span> Company Name <span class="required">*</span>
             </label>
-            <input type="text" id="companyName" name="companyName" required placeholder="Acme Corporation" />
+            <input type="text" id="company" name="company" required placeholder="Acme Corporation" />
           </div>
           
           <div class="form-group">
@@ -987,7 +987,7 @@
           
           <div class="form-group nda-group">
             <label class="checkbox-item nda-checkbox">
-              <input type="checkbox" id="acceptNDA" name="acceptNDA" required />
+              <input type="checkbox" id="ndaAgreed" name="ndaAgreed" required />
               <span class="checkbox-label">
                 I accept the <a href="#" onclick="showNDAModal(); return false;">Non-Disclosure Agreement</a> 
                 and agree to keep all shared documents confidential. <span class="required">*</span>
@@ -1224,7 +1224,7 @@
             // Get form values - try multiple possible IDs
             const fullName = (document.getElementById('full-name') || document.getElementById('fullName') || form.querySelector('input[name="fullName"]'))?.value || '';
             const email = (document.getElementById('email') || form.querySelector('input[name="email"]'))?.value || '';
-            const companyName = (document.getElementById('company-name') || document.getElementById('companyName') || form.querySelector('input[name="companyName"]'))?.value || '';
+            const companyName = (document.getElementById('company-name') || document.getElementById('companyName') || form.querySelector('input[name="company"]'))?.value || '';
             
             if (!fullName || !email || !companyName) {
                 showStatus('Please fill in all required fields.', 'error');
