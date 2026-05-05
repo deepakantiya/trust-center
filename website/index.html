@@ -1260,7 +1260,19 @@
                 
                 if (result.success) {
                     hideStatus();
-                    showSuccessPage(result);
+                    // Token-based flow: show email-sent confirmation instead of inline links
+                    showStatus(
+                      '📧 Check your inbox! We\'ve sent a secure link to your email address. ' +
+                      'Click it to access your documents. The link is valid for 7 days.',
+                      'success'
+                    );
+                    if (submitBtn) {
+                        submitBtn.innerHTML = originalBtnText;
+                        submitBtn.disabled = true;
+                    }
+                    // Hide form on success so user doesn't accidentally resubmit
+                    const form = document.getElementById('document-request-form');
+                    if (form) form.style.display = 'none';
                 } else {
                     showStatus(result.error || 'An error occurred. Please try again.', 'error');
                     if (submitBtn) {
