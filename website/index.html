@@ -1076,8 +1076,30 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // === TRUST CENTER DOCUMENT REQUEST FORM ===
-        const SUPABASE_EDGE_FUNCTION_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co/functions/v1/request-documents';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWdmbXFybHhoaW9sbGRlY3hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc2NTk2MTQsImV4cCI6MjA1MzIzNTYxNH0.gDmWrDpG2GDXV7EAKIXoKMFD_e5R__kzdrC1tYzzxD4';
+        // Supabase configuration - loaded from Vercel environment variables at runtime
+        let SUPABASE_EDGE_FUNCTION_URL = '';
+        let SUPABASE_ANON_KEY = '';
+        let configLoaded = false;
+        
+        // Load configuration from Vercel API route
+        async function loadSupabaseConfig() {
+            if (configLoaded) return;
+            try {
+                const response = await fetch('/api/config');
+                if (!response.ok) throw new Error('Config fetch failed');
+                const config = await response.json();
+                SUPABASE_EDGE_FUNCTION_URL = config.edgeFunctionUrl;
+                SUPABASE_ANON_KEY = config.supabaseAnonKey;
+                configLoaded = true;
+                console.log('Supabase config loaded successfully');
+            } catch (error) {
+                console.error('Failed to load Supabase config:', error);
+                showStatus('Configuration error. Please refresh the page.', 'error');
+            }
+        }
+        
+        // Load config on page load
+        loadSupabaseConfig();
 
         // Status message helper
         function showStatus(message, type = 'info') {
@@ -1222,6 +1244,14 @@
             }
             
             try {
+                // Ensure config is loaded before submitting
+                if (!configLoaded) {
+                    await loadSupabaseConfig();
+                    if (!configLoaded) {
+                        showStatus('Configuration not loaded. Please refresh the page.', 'error');
+                        return;
+                    }
+                }
                 console.log('Sending request to:', SUPABASE_EDGE_FUNCTION_URL);
                 const response = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
                     method: 'POST',
