@@ -90,49 +90,17 @@ function safeUrl(url) {
 function showDocLinks(name, links) {
   if (!linksPanel || !requestForm) return;
 
-  const cards = links.map(l => {
+  const cardsHtml = links.map(l => {
     const href = safeUrl(l.url);
+    const label = escHtml(l.label);
     if (!href) {
-      return `
-        <div class="doc-link-card doc-link-unavailable">
-          <div class="doc-link-info">
-            <span class="doc-link-icon">📄</span>
-            <div>
-              <strong>${escHtml(l.label)}</strong>
-              <span class="doc-link-note">Temporarily unavailable — we'll follow up by email.</span>
-            </div>
-          </div>
-        </div>`;
+      return `<div class="doc-link-card doc-link-unavailable"><div class="doc-link-info"><span class="doc-link-icon">📄</span><div><strong>${label}</strong><span class="doc-link-note">Temporarily unavailable — we'll follow up by email.</span></div></div></div>`;
     }
-    return `
-      <div class="doc-link-card">
-        <div class="doc-link-info">
-          <span class="doc-link-icon">📄</span>
-          <div>
-            <strong>${escHtml(l.label)}</strong>
-            <span class="doc-link-note">Link expires in 7 days</span>
-          </div>
-        </div>
-        <a class="btn btn-primary doc-link-btn" href="${href}" target="_blank" rel="noopener noreferrer">
-          Download PDF
-        </a>
-      </div>`;
+    return `<div class="doc-link-card"><div class="doc-link-info"><span class="doc-link-icon">📄</span><div><strong>${label}</strong><span class="doc-link-note">Link expires in 7 days</span></div></div><a class="btn btn-primary doc-link-btn" href="${href}" target="_blank" rel="noopener noreferrer">Download PDF</a></div>`;
   }).join('');
 
-  const panelHtml = `
-    <div class="doc-links-header">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-      <div>
-        <h3>Your documents are ready, ${escHtml(name)}</h3>
-        <p>These are unique, secure links governed by the NDA you accepted. Do not share them.</p>
-      </div>
-    </div>
-    <div class="doc-links-list">${cards}</div>
-    <div class="doc-links-footer">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Links are unique to this session and expire automatically after 7 days.
-      <button class="doc-links-reset" onclick="resetForm()">Request different documents</button>
-    </div>`;
+  const escapedName = escHtml(name);
+  const panelHtml = `<div class="doc-links-header"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><div><h3>Your documents are ready, ${escapedName}</h3><p>These are unique, secure links governed by the NDA you accepted. Do not share them.</p></div></div><div class="doc-links-list">${cardsHtml}</div><div class="doc-links-footer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Links are unique to this session and expire automatically after 7 days.<button class="doc-links-reset" onclick="resetForm()">Request different documents</button></div>`;
   linksPanel.innerHTML = panelHtml; // nosemgrep
 
   requestForm.hidden = true;
@@ -150,8 +118,10 @@ function resetForm() {
   if (submitBtn) submitBtn.disabled = true;
 }
 
+const HTML_ESCAPE_MAP = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+const HTML_ESCAPE_REGEX = /[&<>"']/g;
 function escHtml(str) {
-  return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return str.replace(HTML_ESCAPE_REGEX, c => HTML_ESCAPE_MAP[c]);
 }
 
 function showFeedback(type, message) {

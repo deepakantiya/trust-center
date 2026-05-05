@@ -110,11 +110,18 @@ serve(async (req) => {
   const links: { key: string; label: string; url: string; expires_at: string }[] = [];
   const shortRows: { code: string; request_id: string; doc_key: string; full_url: string; expires_at: string }[] = [];
 
-  for (const key of validDocs) {
-    const { data: signed, error: storageErr } = await supabase.storage
-      .from(STORAGE_BUCKET)
-      .createSignedUrl(DOC_PATHS[key], LINK_TTL_SECONDS);
+  // Generate all signed URLs in parallel for better performance
+  const signedUrlResults = await Promise.all(
+    validDocs.map(key =>
+      supabase.storage
+        .from(STORAGE_BUCKET)
+        .createSignedUrl(DOC_PATHS[key], LINK_TTL_SECONDS)
+        .then(result => ({ key, ...result }))
+        .catch(err => ({ key, data: null, error: err }))
+    )
+  );
 
+  for (const { key, data: signed, error: storageErr } of signedUrlResults) {
     if (storageErr || !signed?.signedUrl) {
       console.error(`Signed URL error for ${key}:`, storageErr);
       links.push({ key, label: DOC_LABELS[key], url: "", expires_at: expiresAt });
