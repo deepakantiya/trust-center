@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { PDFDocument, rgb, StandardFonts, degrees } from "https://esm.sh/pdf-lib@1.17.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -8,119 +9,47 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const SITE_BASE_URL = (Deno.env.get("SITE_BASE_URL") ?? "").replace(/\/$/, "");
-// Resend API key — set via: supabase secrets set RESEND_API_KEY=re_...
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
-// From address — must be a verified sender in your Resend/SendGrid account
-const EMAIL_FROM = Deno.env.get("EMAIL_FROM") ?? "trust@yourdomain.com";
 
-const DOC_LABELS: Record<string, string> = {
-  soc2: "SOC 2 Type II Report",
-  iso27001: "ISO 27001 Statement of Applicability",
-  cmmc: "CMMC Assessment Summary (L1 / L2)",
-  pentest: "Penetration Test Executive Summary",
-  dpa: "Data Processing Agreement",
-  questionnaire: "Security Questionnaire (CAIQ / SIG / VSAQ)",
+// 7-day URL validity (in seconds)
+const SIGNED_URL_TTL = 7 * 24 * 60 * 60;
+
+const DOC_PATHS: Record<string, { name: string; path: string; icon: string }> = {
+  soc2:          { name: "SOC 2 Type II Report",                        path: "soc2.pdf",          icon: "🔒" },
+  iso27001:      { name: "ISO 27001 Statement of Applicability",        path: "iso27001.pdf",      icon: "📋" },
+  cmmc:          { name: "CMMC Assessment Summary (L1 / L2)",           path: "cmmc.pdf",          icon: "🛡️" },
+  pentest:       { name: "Penetration Test Executive Summary",          path: "pentest.pdf",       icon: "🔍" },
+  dpa:           { name: "Data Processing Agreement",                   path: "dpa.pdf",           icon: "📜" },
+  questionnaire: { name: "Security Questionnaire (CAIQ / SIG / VSAQ)", path: "questionnaire.pdf", icon: "📝" },
 };
 
-const VALID_DOCS = new Set(Object.keys(DOC_LABELS));
-const TOKEN_BYTES = 32;          // 256-bit token → 64-char hex
-const TOKEN_TTL_SECONDS = 7 * 24 * 60 * 60;   // 7 days
+const VALID_DOCS = new Set(Object.keys(DOC_PATHS));
 
-// Generates a cryptographically random hex token.
-async function generateToken(): Promise<{ raw: string; hash: string }> {
-  const bytes = crypto.getRandomValues(new Uint8Array(TOKEN_BYTES));
-  const raw = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
-  const hashBuf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(raw));
-  const hash = Array.from(new Uint8Array(hashBuf), (b) => b.toString(16).padStart(2, "0")).join("");
-  return { raw, hash };
-}
+// Apply company watermark to every page of a PDF.
+async function watermarkPdf(pdfBytes: Uint8Array, company: string): Promise<Uint8Array> {
+  const pdfDoc = await PDFDocument.load(pdfBytes);
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const bold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const date = new Date().toISOString().split("T")[0];
 
-// Sends a retrieval email via Resend (swap for SendGrid / Postmark if preferred).
-async function sendRetrievalEmail(
-  to: string,
-  name: string,
-  company: string,
-  docs: string[],
-  retrieveUrl: string,
-  expiresAt: string,
-): Promise<void> {
-  if (!RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY not set — skipping email send");
-    return;
+  for (const page of pdfDoc.getPages()) {
+    const { width, height } = page.getSize();
+
+    page.drawText(`Confidential – Exclusively for ${company}`, {
+      x: width / 6, y: height / 2,
+      size: 28, font,
+      color: rgb(0.85, 0.85, 0.85), opacity: 0.35,
+      rotate: degrees(-45),
+    });
+    page.drawText(`Prepared exclusively for: ${company} | ${date}`, {
+      x: 40, y: 25, size: 8, font, color: rgb(0.5, 0.5, 0.5),
+    });
+    page.drawText("CONFIDENTIAL", {
+      x: width - 120, y: height - 30, size: 10, font: bold,
+      color: rgb(0.7, 0.3, 0.3), opacity: 0.6,
+    });
   }
 
-  const docList = docs
-    .filter((d) => d in DOC_LABELS)
-    .map((d) => `<li>${DOC_LABELS[d]}</li>`)
-    .join("");
-
-  const expiresDate = new Date(expiresAt).toLocaleDateString("en-US", {
-    weekday: "long", year: "numeric", month: "long", day: "numeric",
-  });
-
-  const html = `
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"></head>
-<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 32px 16px; color: #111827;">
-  <div style="border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 24px;">
-    <h1 style="margin: 0; font-size: 22px; color: #1e40af;">Trust Center</h1>
-    <p style="margin: 4px 0 0; font-size: 14px; color: #6b7280;">Security &amp; Compliance Documentation</p>
-  </div>
-
-  <p style="font-size: 16px;">Hi ${name},</p>
-  <p>Thank you for requesting our compliance documentation. Your documents are ready for download.</p>
-
-  <p style="font-weight: 600; margin-top: 24px;">Documents requested:</p>
-  <ul style="color: #374151; line-height: 1.8;">${docList}</ul>
-
-  <div style="margin: 32px 0; text-align: center;">
-    <a href="${retrieveUrl}"
-       style="background: #2563eb; color: #ffffff; padding: 14px 32px; border-radius: 8px;
-              text-decoration: none; font-weight: 600; font-size: 16px; display: inline-block;">
-      📥 Access My Documents
-    </a>
-  </div>
-
-  <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 24px;">
-    <p style="margin: 0; font-size: 14px; color: #92400e;">
-      <strong>⏰ Link expires:</strong> ${expiresDate}<br>
-      This link can be used up to 3 times. Do not share it with others.
-    </p>
-  </div>
-
-  <p style="font-size: 14px; color: #6b7280;">
-    By accessing these documents you confirm your acceptance of the Non-Disclosure Agreement
-    you signed on behalf of <strong>${company}</strong>.
-  </p>
-
-  <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
-  <p style="font-size: 12px; color: #9ca3af; margin: 0;">
-    If you did not request these documents, please ignore this email.
-    Questions? Reply to this email.
-  </p>
-</body>
-</html>`;
-
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: EMAIL_FROM,
-      to,
-      subject: "Your Trust Center documents are ready",
-      html,
-    }),
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Email send failed (${res.status}): ${body}`);
-  }
+  return await pdfDoc.save();
 }
 
 serve(async (req) => {
@@ -138,33 +67,31 @@ serve(async (req) => {
     return json({ error: "Invalid JSON body" }, 400);
   }
 
-  const { fullName, email, companyName, documents, ndaAccepted } = body as {
-    fullName: string;
-    email: string;
-    companyName: string;
-    documents: string[];
-    ndaAccepted: boolean;
-  };
+  // Accept both camelCase and snake_case for resilience
+  const fullName     = (body.fullName     ?? body.full_name     ?? "") as string;
+  const email        = (body.email        ?? "") as string;
+  const companyName  = (body.companyName  ?? body.company       ?? body.company_name ?? "") as string;
+  const documents    = (body.documents    ?? []) as string[];
+  const ndaAccepted  = Boolean(body.ndaAccepted ?? body.ndaAgreed ?? body.nda_accepted ?? body.nda_agreed);
 
-  // Validate required fields
   if (!fullName?.trim() || !email?.trim() || !companyName?.trim()) {
-    return json({ error: "fullName, email, and companyName are required" }, 400);
+    return json({ error: "Full name, email, and company name are required." }, 400);
   }
   if (!ndaAccepted) {
-    return json({ error: "NDA must be accepted before submitting" }, 400);
+    return json({ error: "You must accept the NDA before submitting." }, 400);
   }
   if (!Array.isArray(documents) || documents.length === 0) {
-    return json({ error: "Select at least one document" }, 400);
+    return json({ error: "Please select at least one document." }, 400);
   }
 
   const validDocs = documents.filter((d) => VALID_DOCS.has(d));
   if (validDocs.length === 0) {
-    return json({ error: "No recognised document types selected" }, 400);
+    return json({ error: "No recognised document types selected." }, 400);
   }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-  // 1. Store the document request
+  // 1. Record the request
   const { data: record, error: insertError } = await supabase
     .from("document_requests")
     .insert({
@@ -183,48 +110,66 @@ serve(async (req) => {
     return json({ error: "Failed to save your request. Please try again." }, 500);
   }
 
-  // 2. Generate a secure token and store its hash
-  const { raw: rawToken, hash: tokenHash } = await generateToken();
-  const expiresAt = new Date(Date.now() + TOKEN_TTL_SECONDS * 1000).toISOString();
+  // 2. Generate watermarked PDFs and 7-day signed URLs (in parallel)
+  const safeCompany = companyName.trim().replace(/[^a-zA-Z0-9]/g, "_").substring(0, 50);
+  const timestamp = Date.now();
+  const expiresAt = new Date(Date.now() + SIGNED_URL_TTL * 1000).toISOString();
 
-  const { error: tokenError } = await supabase.from("access_tokens").insert({
-    token_hash: tokenHash,
-    request_id: record.id,
-    email: email.trim().toLowerCase(),
-    expires_at: expiresAt,
-    max_uses: 3,
-  });
+  const results = await Promise.allSettled(
+    validDocs.map(async (key) => {
+      const doc = DOC_PATHS[key];
 
-  if (tokenError) {
-    console.error("Token insert error:", tokenError);
-    // Still succeed — user can contact support if email doesn't arrive
+      const { data: original, error: dlErr } = await supabase.storage
+        .from("audit-docs")
+        .download(doc.path);
+      if (dlErr || !original) throw new Error(`Download failed: ${doc.path}`);
+
+      const pdfBytes = new Uint8Array(await original.arrayBuffer());
+      const watermarked = await watermarkPdf(pdfBytes, companyName.trim());
+
+      const uploadPath = `watermarked/${safeCompany}/${timestamp}_${doc.path}`;
+      const { error: upErr } = await supabase.storage
+        .from("audit-docs")
+        .upload(uploadPath, watermarked, { contentType: "application/pdf", upsert: true });
+      if (upErr) throw new Error(`Upload failed: ${uploadPath}`);
+
+      const { data: signed, error: signErr } = await supabase.storage
+        .from("audit-docs")
+        .createSignedUrl(uploadPath, SIGNED_URL_TTL);
+      if (signErr || !signed?.signedUrl) throw new Error(`Signed URL failed: ${uploadPath}`);
+
+      return { key, name: doc.name, icon: doc.icon, url: signed.signedUrl };
+    }),
+  );
+
+  const documentsOut: { key: string; name: string; icon: string; url: string }[] = [];
+  for (const result of results) {
+    if (result.status === "fulfilled") {
+      documentsOut.push(result.value);
+    } else {
+      console.error("Document generation error:", result.reason);
+    }
   }
 
-  // 3. Send retrieval email with the raw token embedded in the link
-  const retrieveUrl = `${SITE_BASE_URL}/retrieve?token=${rawToken}`;
-  try {
-    await sendRetrievalEmail(
-      email.trim().toLowerCase(),
-      fullName.trim(),
-      companyName.trim(),
-      validDocs,
-      retrieveUrl,
-      expiresAt,
-    );
-  } catch (emailErr) {
-    console.error("Email send error:", emailErr);
-    // Non-fatal: request is saved; user can request resend later
+  if (documentsOut.length === 0) {
+    return json({ error: "Failed to generate documents. Please try again later." }, 500);
   }
 
-  // 4. Update status to 'completed' (request recorded, email dispatched)
+  // 3. Persist the generated links and mark request completed
   await supabase
     .from("document_requests")
-    .update({ status: "completed" })
+    .update({
+      status: "completed",
+      links: documentsOut,
+    })
     .eq("id", record.id);
 
   return json({
     success: true,
-    message: "Check your email for a secure link to access your documents.",
+    name: fullName.trim(),
+    company: companyName.trim(),
+    documents: documentsOut,
+    expiresAt,
   });
 });
 

@@ -10,7 +10,6 @@ export default function handler(req, res) {
   const env = {
     EDGE_FUNCTION_URL:        process.env.EDGE_FUNCTION_URL        ?? '',
     SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY ?? '',
-    VERIFY_FUNCTION_URL:      process.env.VERIFY_FUNCTION_URL      ?? '',
   };
 
   // JSON.stringify escapes all values safely — no injection risk.
