@@ -6,7 +6,7 @@
 // ============================================================================
 
 const SUPABASE_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co';  // e.g., https://abc123.supabase.co
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWdmbXFybHhoaW9sbGRlY3hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2MDEwOTAsImV4cCI6MjA5MzE3NzA5MH0.G58GAn9_jA0nKylGGo1NogF1Gitbtj9hta-O6Zs4OHc';
+const SUPABASE_ANON_KEY = 'sb_publishable_xtPucbBGqU9hC0aYKtGESw_9zLbY0Eq';
 const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/request-documents`;
 
 // Initialize Supabase client
