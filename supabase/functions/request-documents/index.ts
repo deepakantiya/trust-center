@@ -60,55 +60,60 @@ serve(async (req) => {
     return json({ error: "Method not allowed" }, 405);
   }
 
-  let body: Record<string, unknown>;
   try {
-    body = await req.json();
-  } catch {
-    return json({ error: "Invalid JSON body" }, 400);
-  }
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: "Invalid JSON body" }, 400);
+    }
 
-  // Accept both camelCase and snake_case for resilience
-  const fullName     = (body.fullName     ?? body.full_name     ?? "") as string;
-  const email        = (body.email        ?? "") as string;
-  const companyName  = (body.companyName  ?? body.company       ?? body.company_name ?? "") as string;
-  const documents    = (body.documents    ?? []) as string[];
-  const ndaAccepted  = Boolean(body.ndaAccepted ?? body.ndaAgreed ?? body.nda_accepted ?? body.nda_agreed);
+    // Accept both camelCase and snake_case for resilience
+    const fullName     = (body.fullName     ?? body.full_name     ?? "") as string;
+    const email        = (body.email        ?? "") as string;
+    const companyName  = (body.companyName  ?? body.company       ?? body.company_name ?? "") as string;
+    const documents    = (body.documents    ?? []) as string[];
+    const ndaAccepted  = Boolean(body.ndaAccepted ?? body.ndaAgreed ?? body.nda_accepted ?? body.nda_agreed);
 
-  if (!fullName?.trim() || !email?.trim() || !companyName?.trim()) {
-    return json({ error: "Full name, email, and company name are required." }, 400);
-  }
-  if (!ndaAccepted) {
-    return json({ error: "You must accept the NDA before submitting." }, 400);
-  }
-  if (!Array.isArray(documents) || documents.length === 0) {
-    return json({ error: "Please select at least one document." }, 400);
-  }
+    if (!fullName?.trim() || !email?.trim() || !companyName?.trim()) {
+      return json({ error: "Full name, email, and company name are required." }, 400);
+    }
+    if (!ndaAccepted) {
+      return json({ error: "You must accept the NDA before submitting." }, 400);
+    }
+    if (!Array.isArray(documents) || documents.length === 0) {
+      return json({ error: "Please select at least one document." }, 400);
+    }
 
-  const validDocs = documents.filter((d) => VALID_DOCS.has(d));
-  if (validDocs.length === 0) {
-    return json({ error: "No recognised document types selected." }, 400);
-  }
+    const validDocs = documents.filter((d) => VALID_DOCS.has(d));
+    if (validDocs.length === 0) {
+      return json({ error: "No recognised document types selected." }, 400);
+    }
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    console.log("Creating Supabase client...");
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    console.log("Supabase client created successfully");
 
-  // 1. Record the request
-  const { data: record, error: insertError } = await supabase
-    .from("document_requests")
-    .insert({
-      name: fullName.trim(),
-      email: email.trim().toLowerCase(),
-      company: companyName.trim(),
-      docs: validDocs,
-      nda_accepted: true,
-      status: "pending",
-    })
-    .select("id")
-    .single();
+    // 1. Record the request
+    console.log("Inserting request into database...");
+    const { data: record, error: insertError } = await supabase
+      .from("document_requests")
+      .insert({
+        name: fullName.trim(),
+        email: email.trim().toLowerCase(),
+        company: companyName.trim(),
+        docs: validDocs,
+        nda_accepted: true,
+        status: "pending",
+      })
+      .select("id")
+      .single();
 
-  if (insertError || !record) {
-    console.error("DB insert error:", insertError);
-    return json({ error: "Failed to save your request. Please try again." }, 500);
-  }
+    if (insertError || !record) {
+      console.error("DB insert error:", insertError);
+      return json({ error: "Failed to save your request. Please try again." }, 500);
+    }
+    console.log("Request inserted with ID:", record.id);
 
   // 2. Generate watermarked PDFs and 7-day signed URLs (in parallel)
   const safeCompany = companyName.trim().replace(/[^a-zA-Z0-9]/g, "_").substring(0, 50);
@@ -197,6 +202,11 @@ serve(async (req) => {
     documents: documentsOut,
     expiresAt,
   });
+  } catch (err) {
+    console.error("Unhandled error:", err);
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    return json({ error: `Internal error: ${errorMsg}` }, 500);
+  }
 });
 
 function json(body: unknown, status = 200) {
