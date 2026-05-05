@@ -1077,6 +1077,7 @@
     <script>
         // === TRUST CENTER DOCUMENT REQUEST FORM ===
         const SUPABASE_EDGE_FUNCTION_URL = 'https://jdagfmqrlxhiolldecxq.supabase.co/functions/v1/request-documents';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWdmbXFybHhoaW9sbGRlY3hxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc2NTk2MTQsImV4cCI6MjA1MzIzNTYxNH0.gDmWrDpG2GDXV7EAKIXoKMFD_e5R__kzdrC1tYzzxD4';
 
         // Status message helper
         function showStatus(message, type = 'info') {
@@ -1243,7 +1244,8 @@
                 const response = await fetch(SUPABASE_EDGE_FUNCTION_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                     },
                     body: JSON.stringify({
                         fullName: fullName,
